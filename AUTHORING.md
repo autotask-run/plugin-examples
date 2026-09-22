@@ -4,7 +4,7 @@ Public listing means **third-party submission → platform review and publicatio
 
 The first supported type is a remote HTTPS MCP tool using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. Local executables, built-in Go extensions, hooks, skills, UI extensions, shared secrets and OAuth are outside this author submission release.
 
-[Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](/docs/plugin-development.md) · [Manifest schema](/schemas/plugin-submission.schema.json)
+[Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
 ## Run the example
 

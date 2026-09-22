@@ -229,14 +229,28 @@
                     "type": "string"
                   }
                 }
+              },
+              "title": {
+                "type": "string"
+              },
+              "display": {
+                "type": "object"
+              },
+              "output_schema": {
+                "type": "object"
               }
-            }
+            },
+            "additionalProperties": false
           }
         }
       }
     },
     "configuration": false,
     "distribution": false,
-    "bindings": false
-  }
+    "bindings": false,
+    "$schema": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
 }

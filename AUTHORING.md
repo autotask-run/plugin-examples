@@ -85,7 +85,7 @@ autotask plugin catalog show --plugin-id user-42/text-stats --json
 autotask plugin enable --plugin-id user-42/text-stats --capability text_stats --scope workspace --target-type agent_profile --target-id <PROFILE_ID>
 ```
 
-Enable means install and bind. Use that profile in a new session and request a text_stats call. Check the actual call and result, not just installed status or MCP downlink. Remove bindings before uninstalling through plugin management.
+Enable means install and bind. Start an **Agent task session** with that profile; ordinary chat sessions do not currently load third-party MCP tools. For a reproducible check, ask the Agent to call `text_stats` exactly once with `{"text":"你好 AutoTask\nPlugins work"}`. The tool call should contain both lines with no trailing newline and return `{"characters":24,"words":4,"lines":2}`. A text-only task may then ask for a code repository; choose **Continue without repository**. Check the actual tool-call event and result, not just installed status or MCP downlink. Remove bindings before uninstalling through plugin management.
 
 ## REST alternative
 

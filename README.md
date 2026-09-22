@@ -23,7 +23,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 | [prepare.py](remote-mcp/prepare.py) | Fill in your author ID and hosted endpoint |
 | [submission.schema.json](remote-mcp/submission.schema.json) | Editor validation for the public submission subset |
 
-The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI `plugin submit` / `plugin submissions`. It is not present in older releases. The MCP example itself runs independently of AutoTask.
+The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.
 
 First supported submission scope: remote HTTPS MCP tools without shared credentials. Platform review and publication remain separate from submission, installation, profile binding and actual tool invocation. Executable packages, OAuth and authenticated remote providers are not part of this example.
 

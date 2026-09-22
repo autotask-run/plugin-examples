@@ -21,7 +21,7 @@ The example text `你好 AutoTask\nPlugins work` returns 24 characters, 4 whites
 
 ## Prepare and submit
 
-Use a CLI exposing `plugin submit` and `plugin submissions`, and a server exposing `/api/v1/plugin-submissions`. If commands are missing or the API returns 404, upgrade first. This capability is independent from older `plugin publish` commands.
+Use AutoTask CLI **0.1.1 or later** and a server exposing `/api/v1/plugin-submissions`. If the API returns 404, the server has not been upgraded. This capability is independent from older `plugin publish` commands.
 
 ```bash
 autotask login

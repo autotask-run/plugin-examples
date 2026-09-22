@@ -1,0 +1,12 @@
+name: Test examples
+on: [push, pull_request]
+jobs:
+  remote-mcp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python3 -m unittest discover -s remote-mcp -v
+      - run: python3 remote-mcp/prepare.py --author-id 42 --url https://mcp.example.com/mcp

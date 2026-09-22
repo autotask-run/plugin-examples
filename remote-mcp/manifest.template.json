@@ -1,0 +1,33 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-7/text-stats",
+    "name": "text-stats",
+    "display_name": "Text Statistics",
+    "version": "1.0.0",
+    "description": "Count characters, words and lines without storing the input.",
+    "author": {"name": "Example author"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {"plugin_kind": "mcp_server", "runtime_kinds": ["mcp"], "source_kind": "native"},
+  "runtimes": [{"runtime_id": "text-stats", "kind": "mcp", "protocol": "mcp"}],
+  "permissions": [{"permission": "network:mcp.example.com", "risk_level": "low"}],
+  "capabilities": {
+    "tools": [{
+      "name": "text_stats",
+      "title": "Text Statistics",
+      "description": "Count Unicode characters, whitespace-separated words and lines in supplied text.",
+      "runtime_id": "text-stats",
+      "runtime_kind": "mcp",
+      "support_level": "executable_existing_runtime",
+      "risk_level": "low",
+      "permissions": ["network:mcp.example.com"],
+      "input_schema": {"type": "object", "properties": {"text": {"type": "string", "maxLength": 10000}}, "required": ["text"], "additionalProperties": false},
+      "metadata": {
+        "mcp_tool_name": "text_stats",
+        "mcp_server": {"name": "user-7-text-stats", "config": {"url": "https://mcp.example.com/mcp", "transport": "streamable-http"}}
+      }
+    }]
+  }
+}

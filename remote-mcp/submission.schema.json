@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://docs.autotask.run/schemas/plugin-submission.schema.json",
+  "title": "AutoTask remote MCP author submission manifest",
+  "description": "Author namespace, permission references and endpoint policy are additionally enforced server-side. This schema covers the remote MCP submission subset, not every internal plugin runtime.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "identity",
+    "classification",
+    "runtimes",
+    "permissions",
+    "capabilities"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "autotask.plugin.v1"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "plugin_id",
+        "name",
+        "description",
+        "version"
+      ],
+      "properties": {
+        "plugin_id": {
+          "type": "string",
+          "pattern": "^user-[1-9][0-9]*/[a-z][a-z0-9-]{0,63}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "required": [
+        "plugin_kind",
+        "source_kind",
+        "runtime_kinds"
+      ],
+      "properties": {
+        "plugin_kind": {
+          "const": "mcp_server"
+        },
+        "source_kind": {
+          "const": "native"
+        },
+        "runtime_kinds": {
+          "const": [
+            "mcp"
+          ]
+        }
+      }
+    },
+    "runtimes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runtime_id",
+          "kind",
+          "protocol"
+        ],
+        "properties": {
+          "runtime_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "const": "mcp"
+          },
+          "protocol": {
+            "const": "mcp"
+          }
+        }
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "permission"
+        ],
+        "properties": {
+          "permission": {
+            "type": "string",
+            "minLength": 1
+          },
+          "risk_level": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tools"
+      ],
+      "properties": {
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "description",
+              "runtime_id",
+              "runtime_kind",
+              "support_level",
+              "risk_level",
+              "input_schema",
+              "permissions",
+              "metadata"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "runtime_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "runtime_kind": {
+                "const": "mcp"
+              },
+              "support_level": {
+                "const": "executable_existing_runtime"
+              },
+              "risk_level": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              },
+              "input_schema": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "object"
+                  }
+                }
+              },
+              "permissions": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "mcp_tool_name",
+                  "mcp_server"
+                ],
+                "properties": {
+                  "mcp_tool_name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mcp_server": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "config"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "config": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "url",
+                          "transport"
+                        ],
+                        "properties": {
+                          "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://[^?\\#@]+$"
+                          },
+                          "transport": {
+                            "const": "streamable-http"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "prompt_instructions": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "configuration": false,
+    "distribution": false,
+    "bindings": false
+  }
+}

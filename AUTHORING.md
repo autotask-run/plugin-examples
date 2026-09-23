@@ -23,6 +23,8 @@ The example text `你好 AutoTask\nPlugins work` returns 24 characters, 4 whites
 
 Use AutoTask CLI **0.1.1 or later** and a server exposing `/api/v1/plugin-submissions`. If the API returns 404, the server has not been upgraded. This capability is independent from older `plugin publish` commands.
 
+If you do not have an account, [register as an ordinary user](https://app.autotask.run/register) first. Submission does not require administrator access.
+
 ```bash
 autotask login
 autotask plugin submissions --json
@@ -78,7 +80,7 @@ The version argument is the draft-... governance version in the submission respo
 
 ## Install from another workspace
 
-Sign in as the consumer and select the consumer workspace. Find and install the published plugin in the plugin market, then bind it to a workspace Agent Profile. CLI equivalent:
+Sign in as the consumer and select the consumer workspace. Find and install the published plugin in the plugin market. If the workspace has no Agent Profile yet, [create a workspace profile in Agent Studio](https://app.autotask.run/agent-studio/profiles/new) and note its ID. Confirm that the workspace model provider passes its connection test before starting an Agent task; an invalid model key stops the task before the plugin can run. Bind the plugin to the profile. CLI equivalent:
 
 ```bash
 autotask plugin catalog show --plugin-id user-42/text-stats --json
@@ -106,4 +108,4 @@ python3 -c 'import json; print(json.dumps({"manifest":json.load(open("autotask-p
 curl -X POST "$AUTOTASK_SERVER/api/v1/plugin-submissions" -H "Authorization: Bearer $AUTOTASK_TOKEN" -H 'Content-Type: application/json' --data-binary @submission.json
 ```
 
-If approved but not discoverable, ask the reviewer to publish. If installed but unavailable, check profile binding, Worker connectivity, certificate and /mcp path, then session tool errors. Credential-dependent providers are not yet accepted by this public submission contract. Private workspace publication via plugin publish --scope workspace remains a separate workflow.
+If approved but not discoverable, ask the reviewer to publish. If installed but unavailable, check profile binding, Worker connectivity, certificate and /mcp path, then session tool errors. A model-provider 401 before the tool call requires a working workspace provider and a new task; retrying an old session may keep its original model. Credential-dependent providers are not yet accepted by this public submission contract. Private workspace publication via plugin publish --scope workspace remains a separate workflow.

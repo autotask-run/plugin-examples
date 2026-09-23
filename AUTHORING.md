@@ -69,7 +69,7 @@ autotask plugin submit --submission-id 123 --manifest ./autotask-plugin.json --n
 
 Editing a draft retains its ID. Revising rejected content creates a new draft ID, retaining the original snapshot and review. Track the new returned ID. Published releases are immutable: increment identity.version and create a new submission.
 
-Administrators verify endpoint access, source/license, tool schemas, permissions, error handling and data retention, and actually run initialize/list/call. Approval alone does not publish. Existing asset governance UI or administrator commands perform these steps:
+Administrators verify endpoint access, source/license, tool schemas, permissions, error handling and data retention, and actually run initialize/list/call. Approval alone does not publish. In [Platform → Asset Governance](https://platform.autotask.run/admin/asset-governance), select the plugin asset to review and publish it. Administrator CLI commands are an alternative:
 
 ```bash
 autotask plugin review approve --asset-id user-42/text-stats --review-id 456 --reason "Protocol and permissions verified"

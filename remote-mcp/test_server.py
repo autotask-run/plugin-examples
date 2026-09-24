@@ -3,6 +3,7 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
+from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from server import Handler
 
@@ -53,6 +54,15 @@ class MCPTest(unittest.TestCase):
                 self.call("ping", headers=headers)
             self.assertEqual(error.exception.code, expected)
             error.exception.close()
+
+    def test_optional_api_key(self):
+        with patch.dict("os.environ", {"MCP_API_KEY": "example-secret", "MCP_API_KEY_HEADER": "Authorization", "MCP_API_KEY_PREFIX": "Bearer "}):
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                self.call("tools/list")
+            self.assertEqual(error.exception.code, 401)
+            error.exception.close()
+            _, tools = self.call("tools/list", headers={"Authorization": "Bearer example-secret"})
+            self.assertEqual(tools["result"]["tools"][0]["name"], "text_stats")
 
 
 if __name__ == "__main__":

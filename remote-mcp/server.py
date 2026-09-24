@@ -1,11 +1,13 @@
 """A dependency-free, stateless Streamable HTTP MCP example (Python 3.10+).
 
-Only text supplied in a tool call is processed. No filesystem, network calls,
-credentials or persistent storage. Put behind an HTTPS reverse proxy to publish.
+Only text supplied in a tool call is processed. No filesystem, network calls
+or persistent storage. Optional MCP_API_KEY protects the endpoint; keep it in
+the server environment, never in a plugin manifest or repository.
 """
 import argparse
 import json
 import os
+import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26")
@@ -91,6 +93,15 @@ class Handler(BaseHTTPRequestHandler):
             self.close_connection = True
             self.respond(403, {"error": "Origin not allowed"})
             return
+        configured_key = os.environ.get("MCP_API_KEY")
+        if configured_key:
+            header = os.environ.get("MCP_API_KEY_HEADER", "Authorization")
+            prefix = os.environ.get("MCP_API_KEY_PREFIX", "Bearer ")
+            supplied = self.headers.get(header, "")
+            if not hmac.compare_digest(supplied, prefix + configured_key):
+                self.close_connection = True
+                self.respond(401, {"error": "API key required"})
+                return
         if self.headers.get("MCP-Protocol-Version", PROTOCOL_VERSIONS[0]) not in PROTOCOL_VERSIONS:
             self.close_connection = True
             self.respond(400, {"error": "Unsupported MCP protocol version"})

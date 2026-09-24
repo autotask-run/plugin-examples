@@ -205,6 +205,13 @@
                         "type": "string",
                         "minLength": 1
                       },
+                      "auth": {
+                        "oneOf": [
+                          {"type": "object", "additionalProperties": false, "required": ["type"], "properties": {"type": {"const": "none"}}},
+                          {"type": "object", "additionalProperties": false, "required": ["type", "header"], "properties": {"type": {"const": "api_key"}, "header": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{0,63}$"}, "prefix": {"enum": ["", "Bearer ", "Token "]}}},
+                          {"type": "object", "additionalProperties": false, "required": ["type", "scopes"], "properties": {"type": {"const": "oauth"}, "scopes": {"type": "array", "maxItems": 20, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Za-z0-9._:/-]{1,128}$"}}}}
+                        ]
+                      },
                       "config": {
                         "type": "object",
                         "additionalProperties": false,

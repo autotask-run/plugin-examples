@@ -4,6 +4,8 @@ A runnable starting point for third-party AutoTask plugin authors.
 
 Start with [remote-mcp](remote-mcp): a dependency-free Python MCP server that counts supplied text. It does not access files, call other services, retain input or require credentials.
 
+For replaceable personal memory, see [memory-mcp](memory-mcp): an independent authenticated MCP server with persistent SQLite storage and a reviewed memory-provider manifest. Its tests cover all four operations and cross-user namespace isolation.
+
 ```sh
 git clone https://github.com/autotask-run/plugin-examples.git
 cd plugin-examples
@@ -25,7 +27,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 
 The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.
 
-First supported submission scope: remote HTTPS MCP tools without shared credentials. Platform review and publication remain separate from submission, installation, profile binding and actual tool invocation. Executable packages, OAuth and authenticated remote providers are not part of this example.
+Public submissions support remote HTTPS MCP tools and personal memory providers. API keys or OAuth are declared in the manifest and connected by each installer; credentials are never embedded in the submission. Platform review and publication remain separate from installation, profile binding and actual invocation. Executable packages remain outside this example.
 
 The server uses the MCP [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports) and [tools protocol](https://modelcontextprotocol.io/specification/2025-06-18/server/tools). It returns JSON responses and does not provide a server-initiated SSE stream. Unknown browser Origins are rejected by default. Use an HTTPS proxy with rate/request-size limits for a public deployment; this is a small instructional server, not a production hosting stack.
 

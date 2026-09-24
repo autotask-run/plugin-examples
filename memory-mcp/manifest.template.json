@@ -1,0 +1,31 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-7/personal-memory",
+    "name": "personal-memory",
+    "description": "Private, scoped long-term memory over a remote MCP service.",
+    "version": "1.0.0",
+    "author": {"name": "Example author"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {"plugin_kind": "memory_provider", "source_kind": "native", "runtime_kinds": ["mcp"]},
+  "runtimes": [{"runtime_id": "memory", "kind": "mcp", "protocol": "mcp"}],
+  "permissions": [{"permission": "network:memory.example.com"}],
+  "capabilities": {
+    "memory_providers": [{
+      "name": "memory", "description": "Recall, store, correct and delete private memory.",
+      "runtime_id": "memory", "runtime_kind": "mcp", "support_level": "executable_existing_runtime",
+      "provider_id": "personal-memory", "permissions": ["network:memory.example.com"],
+      "operations": {"recall": "memory_recall", "store": "memory_store", "update": "memory_update", "delete": "memory_delete"},
+      "metadata": {
+        "protocol": "autotask.memory.v1",
+        "mcp_server": {
+          "name": "personal-memory",
+          "config": {"url": "https://memory.example.com/mcp", "transport": "streamable-http"},
+          "auth": {"type": "api_key", "header": "Authorization", "prefix": "Bearer "}
+        }
+      }
+    }]
+  }
+}

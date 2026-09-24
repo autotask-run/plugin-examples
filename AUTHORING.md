@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-The first supported type is a remote HTTPS MCP tool using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. Local executables, built-in Go extensions, hooks, skills, UI extensions, shared secrets and OAuth are outside this author submission release.
+Public submissions support remote HTTPS MCP tools and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, skills and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; for memory follow [memory-mcp](memory-mcp/README.md).
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -108,4 +108,4 @@ python3 -c 'import json; print(json.dumps({"manifest":json.load(open("autotask-p
 curl -X POST "$AUTOTASK_SERVER/api/v1/plugin-submissions" -H "Authorization: Bearer $AUTOTASK_TOKEN" -H 'Content-Type: application/json' --data-binary @submission.json
 ```
 
-If approved but not discoverable, ask the reviewer to publish. If installed but unavailable, check profile binding, Worker connectivity, certificate and /mcp path, then session tool errors. A model-provider 401 before the tool call requires a working workspace provider and a new task; retrying an old session may keep its original model. Credential-dependent providers are not yet accepted by this public submission contract. Private workspace publication via plugin publish --scope workspace remains a separate workflow.
+If approved but not discoverable, ask the reviewer to publish. If installed but unavailable, check profile binding, Worker connectivity, certificate and /mcp path, then session tool errors. A model-provider 401 before the tool call requires a working workspace provider and a new task; retrying an old session may keep its original model. Private workspace publication via plugin publish --scope workspace remains a separate workflow.

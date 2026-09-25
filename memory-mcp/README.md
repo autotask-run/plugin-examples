@@ -2,7 +2,7 @@
 
 This independent Python 3.10+ server implements AutoTask's `autotask.memory.v1` contract over MCP Streamable HTTP. It persists records in SQLite and requires an API key. The four tools return MCP `structuredContent`; IDs are opaque `mem:<uuid>` strings. Every operation requires an AutoTask-supplied `namespace` with `user_id` and `profile_id`. User records remain visible across sessions; workspace, project and session records require the matching context.
 
-This is a protocol reference, not a mature memory engine. Existing MCP services such as Mem0 use different argument and result schemas; mapping tool names in the manifest alone is insufficient. A provider-specific bridge and real account test are required.
+This is a protocol reference, not a mature memory engine. A memory plugin implements the four `autotask.memory.v1` tools and may use a library such as Mem0 behind them. Existing MCP services can have different argument and result schemas, so mapping tool names in the manifest alone is insufficient. The plugin author owns any upstream bridge and its real-account test; AutoTask does not ship a provider-specific adapter.
 
 ```sh
 export MEMORY_API_KEY='choose-a-long-random-key'

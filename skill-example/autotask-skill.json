@@ -1,0 +1,43 @@
+{
+  "$schema": "https://autotask.dev/schemas/autotask-skill.json",
+  "id": "example/repository-review",
+  "name": "Repository Review",
+  "version": "1.0.0",
+  "type": "custom",
+  "stage_bindings": [
+    "review"
+  ],
+  "artifacts": {
+    "required_mode": "all_of",
+    "required": [
+      {
+        "type_key": "repository_review",
+        "display_name": "Repository review",
+        "phase": "review",
+        "schema_version": "v1",
+        "validation": {
+          "required_fields": [
+            "summary",
+            "findings"
+          ],
+          "content_json": {
+            "summary": {
+              "type": "string",
+              "min_length": 20
+            },
+            "findings": {
+              "type": "array",
+              "min_items": 1
+            }
+          }
+        }
+      }
+    ],
+    "optional": []
+  },
+  "tools": [
+    "file_read",
+    "file_search",
+    "create_task_artifact"
+  ]
+}

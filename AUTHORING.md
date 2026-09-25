@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, skills and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; for memory follow [memory-mcp](memory-mcp/README.md).
+Public submissions support remote HTTPS MCP tools and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Skill bundles and UI extensions remain outside this author submission release. The `skill-example` and `skill-provider-example` directories are reference fixtures for private/workspace development; they are not accepted by public `plugin submit` in this release. This document follows the `remote-mcp` tool example; for memory follow [memory-mcp](memory-mcp/README.md).
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -12,6 +12,9 @@ Public submissions support remote HTTPS MCP tools and personal memory providers 
 git clone https://github.com/autotask-run/plugin-examples.git
 cd plugin-examples
 python3 -m unittest discover -s remote-mcp -v
+python3 -m unittest discover -s memory-mcp -v
+python3 -m unittest discover -s skill-example -v
+python3 -m unittest discover -s skill-provider-example -v
 python3 remote-mcp/server.py
 ```
 
@@ -47,7 +50,15 @@ autotask plugin submissions --id 123 --json
 
 Omit `--draft-only` to create and submit in one command. If submission fails after saving, retry using the saved ID reported by the CLI.
 
-## Manifest contract
+## Memory provider and private reference examples
+
+The [`memory-mcp`](memory-mcp/README.md) example follows the public `autotask.memory.v1` contract. It is submitted with `plugin_kind=memory_provider`, then an installer supplies API Key/OAuth credentials and verifies create, search, correct and delete on a personal Profile.
+
+[`skill-example`](skill-example/README.md) and [`skill-provider-example`](skill-provider-example/README.md) document the current private/workspace shapes and local contract tests. Their manifests are deliberately marked reference-only. The platform does not currently accept `skill_pack` or `skill_provider` in the ordinary public submission endpoint, and a local validator cannot prove runtime materialization or catalog sync.
+
+## Remote MCP manifest contract
+
+The following contract describes the `remote-mcp` example. The public memory-provider contract is documented in [memory-mcp](memory-mcp/README.md).
 
 - schema_version: autotask.plugin.v1; identity.plugin_id: user-<user_id>/<lowercase-slug>; version: major.minor.patch.
 - classification: plugin_kind=mcp_server, source_kind=native, runtime_kinds=[mcp].

@@ -1,0 +1,85 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "private-7/example-skill-provider",
+    "name": "example-skill-provider",
+    "display_name": "Example Skill Provider",
+    "version": "1.0.0",
+    "description": "A deterministic JSON-lines adapter that demonstrates the Skill Provider operation contract.",
+    "author": {
+      "name": "Example author"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {
+    "plugin_kind": "skill_provider",
+    "runtime_kinds": [
+      "cli_stdio_json"
+    ],
+    "source_kind": "workspace",
+    "categories": [
+      "skill_providers"
+    ]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "example-skill-provider",
+      "kind": "cli_stdio_json",
+      "protocol": "stdio-json-v1",
+      "entrypoint": {
+        "command": "python3",
+        "args": [
+          "provider.py"
+        ]
+      }
+    }
+  ],
+  "permissions": [
+    {
+      "permission": "workspace_scoped",
+      "risk_level": "low"
+    }
+  ],
+  "capabilities": {
+    "skill_providers": [
+      {
+        "name": "example_catalog",
+        "title": "Example inline catalog",
+        "description": "Imports bounded SKILL.md records from a deterministic inline catalog.",
+        "runtime_id": "example-skill-provider",
+        "runtime_kind": "cli_stdio_json",
+        "support_level": "projected_read_only",
+        "risk_level": "low",
+        "permissions": [
+          "workspace_scoped"
+        ],
+        "provider_id": "example_catalog",
+        "source_kinds": [
+          "inline",
+          "example"
+        ],
+        "config_schema": {
+          "type": "object",
+          "properties": {
+            "catalog": {
+              "type": "array",
+              "maxItems": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "operations": {
+          "validate_config": "example_catalog.validate_config",
+          "sync": "example_catalog.sync",
+          "get_content": "example_catalog.get_content",
+          "get_file": "example_catalog.get_file"
+        },
+        "sync_modes": [
+          "full"
+        ],
+        "max_items_default": 100
+      }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "private-7/repository-review-skill",
+    "name": "repository-review-skill",
+    "display_name": "Repository Review Skill",
+    "version": "1.0.0",
+    "description": "A reference Skill bundle that produces an evidence-backed repository review artifact.",
+    "author": {
+      "name": "Example author"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {
+    "plugin_kind": "skill_pack",
+    "runtime_kinds": [
+      "go_builtin"
+    ],
+    "source_kind": "personal",
+    "categories": [
+      "skills"
+    ]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "skill-bundle",
+      "kind": "go_builtin",
+      "entrypoint": {
+        "entry": "agent_profile"
+      }
+    }
+  ],
+  "permissions": [
+    {
+      "permission": "workspace_scoped",
+      "risk_level": "low"
+    }
+  ],
+  "capabilities": {
+    "skills": [
+      {
+        "name": "example/repository-review",
+        "title": "Repository Review Skill",
+        "description": "Produces a repository review artifact without changing implementation files.",
+        "runtime_id": "skill-bundle",
+        "runtime_kind": "skill",
+        "support_level": "projected_read_only",
+        "risk_level": "low",
+        "permissions": [
+          "workspace_scoped"
+        ],
+        "skill_id": "example/repository-review",
+        "version": "1.0.0",
+        "entrypoint": "agent_profile",
+        "bundle_ref": "./",
+        "compatible_agents": [
+          "autotask_builtin"
+        ],
+        "required_tools": [
+          "file_read",
+          "file_search",
+          "create_task_artifact"
+        ],
+        "artifact_contracts": {
+          "repository_review": "v1"
+        }
+      }
+    ]
+  }
+}

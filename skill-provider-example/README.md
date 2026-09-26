@@ -12,10 +12,13 @@ printf '%s\n' '{"operation":"sync","source":{"id":123,"config":{}}}' | python3 s
 ```
 
 The response uses the design's `records`, `source_ref`, `readme_content`,
-`manifest_json`, server-computed-looking `content_hash`, cursor and diagnostics
-fields. The real AutoTask service still validates provider output, computes the
-stored hash, applies scope/ownership rules, and snapshots content before a
-Worker sees it.
+`manifest_json`, server-computed-looking `content_hash`, cursor, `complete`, and
+diagnostics fields. `complete=true` means the response is a full snapshot and
+allows the service to reconcile removed or missing records. A bounded page returns
+`complete=false`; the service may publish the returned records and cursor but must
+keep absent records available and reject removal IDs. The real AutoTask service
+still validates provider output, computes the stored hash, applies scope/ownership
+rules, and snapshots content before a Worker sees it.
 
 `manifest.template.json` is a reference for a workspace/private provider and is
 marked `projected_read_only`. The public `plugin submit` endpoint currently

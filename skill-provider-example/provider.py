@@ -135,6 +135,7 @@ def sync(request: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(max_items, int) or max_items < 1:
         raise ProviderError("invalid_request", "limits.max_items must be a positive integer")
     max_items = min(max_items, MAX_ITEMS)
+    complete = len(items) <= max_items
     records = []
     for item in items[:max_items]:
         records.append({
@@ -150,11 +151,13 @@ def sync(request: dict[str, Any]) -> dict[str, Any]:
             "content_hash": _content_hash(item),
             "available": True,
         })
+    warnings = [] if complete else ["catalog page is partial; absent records must remain available"]
     return {
         "records": records,
         "removed_external_ids": [],
-        "cursor": {"revision": REVISION},
-        "diagnostics": {"items_seen": len(records), "warnings": []},
+        "cursor": {"revision": REVISION, "offset": len(records)},
+        "complete": complete,
+        "diagnostics": {"items_seen": len(records), "warnings": warnings},
     }
 
 

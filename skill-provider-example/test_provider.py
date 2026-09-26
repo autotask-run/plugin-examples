@@ -40,10 +40,17 @@ class SkillProviderTest(unittest.TestCase):
 
         synced = self.call("sync", source={"id": 123, "config": {}}, limits={"max_items": 1})
         self.assertTrue(synced["ok"], synced)
+        self.assertFalse(synced["result"]["complete"])
+        self.assertIn("partial", synced["result"]["diagnostics"]["warnings"][0])
         record = synced["result"]["records"][0]
         self.assertEqual(record["source_ref"]["provider_id"], "example_catalog")
         self.assertEqual(record["source_ref"]["source_id"], 123)
         self.assertTrue(record["content_hash"].startswith("sha256:"))
+
+        complete = self.call("sync", source={"id": 123, "config": {}}, limits={"max_items": 100})
+        self.assertTrue(complete["ok"], complete)
+        self.assertTrue(complete["result"]["complete"])
+        self.assertEqual(complete["result"]["diagnostics"]["warnings"], [])
 
         content = self.call("get_content", source={"id": 123, "config": {}}, skill_id=record["external_id"])
         self.assertTrue(content["ok"], content)

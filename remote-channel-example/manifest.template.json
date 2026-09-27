@@ -1,0 +1,46 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-<author_id>/remote-channel-example",
+    "name": "remote-channel-example",
+    "display_name": "Remote Channel Example",
+    "version": "0.1.0",
+    "description": "A private Remote Channel Bridge backed by an HTTPS Streamable HTTP MCP adapter.",
+    "author": {"name": "Example Author"},
+    "repository": "https://github.com/autotask-run/plugin-examples/tree/main/remote-channel-example",
+    "license": "MIT",
+    "tags": ["channel", "remote", "mcp"]
+  },
+  "classification": {
+    "plugin_kind": "channel_provider",
+    "runtime_kinds": ["mcp"],
+    "source_kind": "workspace",
+    "stability": "experimental",
+    "categories": ["channel", "remote-mcp"]
+  },
+  "runtimes": [{"runtime_id": "remote_bridge", "kind": "mcp", "protocol": "mcp"}],
+  "permissions": ["network:bridge.example.com"],
+  "capabilities": {
+    "channels": [{
+      "name": "remote_bridge",
+      "title": "Remote Bridge",
+      "description": "Private text channel with durable polling and idempotent replies.",
+      "runtime_id": "remote_bridge",
+      "runtime_kind": "mcp",
+      "support_level": "executable_existing_runtime",
+      "risk_level": "medium",
+      "channel_id": "remote_bridge",
+      "provider": "remote_mcp",
+      "events": ["message.received", "reply.sent"],
+      "metadata": {
+        "protocol": "autotask.channel.v1",
+        "operations": {"poll": "bridge_poll", "send": "bridge_send"},
+        "mcp_server": {
+          "name": "remote-channel-example",
+          "config": {"url": "https://bridge.example.com/mcp", "transport": "streamable-http"},
+          "auth": {"type": "none"}
+        }
+      }
+    }]
+  }
+}

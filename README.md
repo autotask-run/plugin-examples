@@ -20,10 +20,7 @@ For workspace-private extensions, see [hook-example](hook-example) for a
 for a prompt Slash Command. These examples use existing server runtimes and
 are intentionally outside the public `plugin submit` allowlist.
 
-For a Channel source integration, see [channel-provider-example](channel-provider-example).
-It is a loopback Go template for the in-process Provider/Runtime Driver
-interfaces, not a standalone service or a public submission. Independent
-Channel distribution requires a future Remote Channel Bridge.
+For a source-integrated Channel, see [channel-provider-example](channel-provider-example). For a workspace-private remote Channel, see [remote-channel-example](remote-channel-example): it implements the bounded `autotask.channel.v1` polling/send contract over Streamable HTTP MCP with cursor and delivery-id tests. It is not in the public submission allowlist yet.
 
 For a local or signed Plugin Store Agent configuration adapter, see
 [agent-adapter-example](agent-adapter-example). It implements the CLI's
@@ -68,6 +65,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 | [hook-example/](hook-example) | Workspace-private `autotask.hook.v1` prompt Hook and lifecycle steps |
 | [slash-command-example/](slash-command-example) | Workspace-private prompt Slash Command, raw args and ambiguity rules |
 | [channel-provider-example/](channel-provider-example) | Source-integrated loopback Channel manifest and Go Provider/Driver template |
+| [remote-channel-example/](remote-channel-example) | Workspace-private Remote Channel Bridge MCP adapter, cursor, and delivery-id tests |
 | [agent-adapter-example/](agent-adapter-example) | Local Agent configuration adapter, JSONL protocol, manifest preparation and preservation tests |
 
 The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.

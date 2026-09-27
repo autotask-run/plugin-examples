@@ -1,0 +1,43 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-7/remote-tool-catalog",
+    "name": "remote-tool-catalog",
+    "description": "A remote MCP Tool Provider with a deterministic paged catalog.",
+    "version": "1.0.0",
+    "author": {"name": "Example author"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {"plugin_kind": "tool_provider", "source_kind": "native", "runtime_kinds": ["mcp"]},
+  "runtimes": [{"runtime_id": "remote-catalog", "kind": "mcp", "protocol": "mcp"}],
+  "permissions": [{"permission": "network:catalog.example.com"}],
+  "capabilities": {
+    "tool_providers": [{
+      "name": "remote_catalog",
+      "title": "Remote Tool Catalog",
+      "description": "Synchronize a remote catalog of no-credential MCP tools.",
+      "runtime_id": "remote-catalog",
+      "runtime_kind": "mcp",
+      "support_level": "executable_existing_runtime",
+      "risk_level": "medium",
+      "permissions": ["network:catalog.example.com"],
+      "provider_id": "remote-tool-catalog",
+      "source_kinds": ["remote_catalog"],
+      "config_schema": {"type": "object", "properties": {}, "additionalProperties": false},
+      "credential_schema": {"type": "object", "properties": {}, "additionalProperties": false},
+      "operations": {"validate_config": "provider_validate_config", "sync_catalog": "provider_sync_catalog"},
+      "sync_modes": ["full", "incremental"],
+      "max_items_default": 100,
+      "allowed_execution_protocols": ["mcp", "streamable-http"],
+      "metadata": {
+        "protocol": "autotask.tool-provider.v1",
+        "mcp_server": {
+          "name": "remote-tool-catalog",
+          "config": {"url": "https://catalog.example.com/provider-mcp", "transport": "streamable-http"},
+          "auth": {"type": "api_key", "header": "Authorization", "prefix": "Bearer "}
+        }
+      }
+    }]
+  }
+}

@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Skill bundles and UI extensions remain outside this author submission release. The `skill-example` and `skill-provider-example` directories are reference fixtures for private/workspace development; they are not accepted by public `plugin submit` in this release. This document follows the `remote-mcp` tool example; for memory follow [memory-mcp](memory-mcp/README.md).
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` catalog contract and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Skill bundles and UI extensions remain outside this author submission release. The `skill-example` and `skill-provider-example` directories are reference fixtures for private/workspace development; they are not accepted by public `plugin submit` in this release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md) for catalog providers and [memory-mcp](memory-mcp/README.md) for memory.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -13,6 +13,7 @@ git clone https://github.com/autotask-run/plugin-examples.git
 cd plugin-examples
 python3 -m unittest discover -s remote-mcp -v
 python3 -m unittest discover -s memory-mcp -v
+python3 -m unittest discover -s remote-tool-provider -v
 python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
 python3 remote-mcp/server.py
@@ -55,6 +56,48 @@ Omit `--draft-only` to create and submit in one command. If submission fails aft
 The [`memory-mcp`](memory-mcp/README.md) example follows the public `autotask.memory.v1` contract. It is submitted with `plugin_kind=memory_provider`, then an installer supplies API Key/OAuth credentials and verifies create, search, correct and delete on a personal Profile.
 
 [`skill-example`](skill-example/README.md) and [`skill-provider-example`](skill-provider-example/README.md) document the current private/workspace shapes and local contract tests. Their manifests are deliberately marked reference-only. The platform does not currently accept `skill_pack` or `skill_provider` in the ordinary public submission endpoint, and a local validator cannot prove runtime materialization or catalog sync.
+
+## Remote Tool Provider contract
+
+The [`remote-tool-provider`](remote-tool-provider/README.md) example
+implements the public `autotask.tool-provider.v1` contract. It declares
+`plugin_kind=tool_provider`, exactly one `capabilities.tool_providers` entry,
+and one public HTTPS Streamable HTTP provider endpoint. The endpoint exposes
+exactly two MCP operations: `validate_config` and `sync_catalog`.
+
+`sync_catalog` receives the Tool Source identity, normalized config, opaque
+cursor, page limit and execution context. It returns bounded catalog items, an
+advancing cursor and `complete`. Each item has a unique `external_id`, bounded
+tool schemas, both `mcp` and `streamable-http` execution protocols, and a
+package manifest containing only a public HTTPS Streamable HTTP MCP endpoint.
+The item descriptor must not contain an API key, OAuth token, header,
+environment variable or command.
+
+The provider installation owns authorization for the provider endpoint. A
+consumer connects that installation with API Key/OAuth, creates a Tool Source
+and syncs the catalog. Sync creates read-only Tool Store rows; it does not
+install or bind returned items. The consumer explicitly installs a catalog
+item, enables it on an Agent Profile, and verifies a real Agent MCP call. The
+returned item endpoint receives no provider credential and therefore needs its
+own public access policy or a separate declared installation flow.
+
+Cursor state resumes only when provider plugin/version and normalized config
+match. A provider or config change starts from an empty cursor; concurrent
+stale pages, duplicate IDs, non-advancing incomplete cursors and
+`not_modified` responses carrying payload changes are rejected. Catalog data
+is third-party metadata and cannot grant official status or execution
+authorization.
+
+Prepare and submit the example with:
+
+```sh
+python3 remote-tool-provider/prepare.py \\
+  --author-id 42 \\
+  --url https://catalog.example.com/provider-mcp \\
+  --item-url https://catalog.example.com/items/weather/mcp
+autotask plugin submit --manifest ./autotask-tool-provider.json --dry-run
+autotask plugin submit --manifest ./autotask-tool-provider.json --json
+```
 
 ## Remote MCP manifest contract
 

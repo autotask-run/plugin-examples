@@ -29,7 +29,7 @@ For workspace-private extensions, see [hook-example](hook-example) for a
 for a prompt Slash Command. These examples use existing server runtimes and
 are intentionally outside the public `plugin submit` allowlist.
 
-For a source-integrated Channel, see [channel-provider-example](channel-provider-example). For a workspace-private remote Channel, see [remote-channel-example](remote-channel-example): it implements the bounded `autotask.channel.v1` polling/send contract over Streamable HTTP MCP with cursor and delivery-id tests. It is not in the public submission allowlist yet.
+For a source-integrated Channel, see [channel-provider-example](channel-provider-example). For the proposed workspace-private Remote Channel Bridge adapter contract, see [remote-channel-example](remote-channel-example): it implements the bounded `autotask.channel.v1` polling/send fixture over Streamable HTTP MCP with cursor and delivery-id tests. The current AutoTask Server does not yet provide the durable Bridge runtime, and it is not in the public submission allowlist.
 
 For a local or signed Plugin Store Agent configuration adapter, see
 [agent-adapter-example](agent-adapter-example). It implements the CLI's

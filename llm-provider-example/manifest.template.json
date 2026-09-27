@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.autotask.run/schemas/plugin-submission.schema.json",
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-<author-id>/example-llm",
+    "name": "example-llm",
+    "display_name": "Example LLM",
+    "description": "A reviewed OpenAI-compatible model endpoint descriptor.",
+    "version": "1.0.0",
+    "author": {"name": "Example Author"},
+    "repository": "https://github.com/autotask-run/plugin-examples/tree/main/llm-provider-example",
+    "license": "Apache-2.0",
+    "tags": ["llm", "openai-compatible"]
+  },
+  "classification": {
+    "plugin_kind": "llm_provider",
+    "source_kind": "native",
+    "stability": "stable",
+    "runtime_kinds": ["llm_provider"],
+    "categories": ["llm"]
+  },
+  "runtimes": [
+    {"runtime_id": "gateway", "kind": "llm_provider", "protocol": "autotask.llm-provider.v1"}
+  ],
+  "permissions": [
+    {"permission": "network:api.example.com", "risk_level": "medium"}
+  ],
+  "capabilities": {
+    "llm_providers": [
+      {
+        "name": "example",
+        "title": "Example Models",
+        "description": "Routes workspace LLM calls to the reviewed Example endpoint.",
+        "runtime_id": "gateway",
+        "runtime_kind": "llm_provider",
+        "support_level": "gateway_handoff_supported",
+        "risk_level": "medium",
+        "permissions": ["network:api.example.com"],
+        "metadata": {
+          "protocol": "openai-compatible-v1",
+          "default_base_url": "https://api.example.com/v1",
+          "default_model": "example-small",
+          "default_api_format": "openai",
+          "models": ["example-small", "example-large"],
+          "config_fields": [
+            {"key": "base_url", "label": "Reviewed endpoint", "type": "text", "required": true, "default": "https://api.example.com/v1"},
+            {"key": "api_key", "label": "API key", "type": "password", "required": true, "sensitive": true},
+            {"key": "model", "label": "Model", "type": "select", "required": true, "options": ["example-small", "example-large"], "default": "example-small"}
+          ]
+        }
+      }
+    ]
+  }
+}

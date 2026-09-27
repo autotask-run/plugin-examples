@@ -1,0 +1,95 @@
+{
+  "$schema": "https://docs.autotask.run/schemas/plugin-submission.schema.json",
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-__AUTHOR_ID__/repository-review-panel",
+    "name": "repository-review-panel",
+    "description": "Create a bounded repository review task from Agent Studio.",
+    "version": "1.0.0",
+    "author": {
+      "name": "__AUTHOR_NAME__",
+      "url": "https://github.com/__AUTHOR_HANDLE__"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples"
+  },
+  "classification": {
+    "plugin_kind": "ui_extension",
+    "source_kind": "native",
+    "stability": "stable",
+    "runtime_kinds": ["hosted"],
+    "categories": ["agent_studio", "productivity"]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "hosted",
+      "kind": "hosted",
+      "protocol": "autotask.ui-panel.v1"
+    }
+  ],
+  "permissions": [
+    {
+      "permission": "task:create",
+      "risk_level": "low"
+    }
+  ],
+  "capabilities": {
+    "ui_extensions": [
+      {
+        "name": "repository_review",
+        "title": "Repository review",
+        "description": "Create a review task with a fixed native Agent Studio panel.",
+        "runtime_id": "hosted",
+        "runtime_kind": "hosted",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["task:create"],
+        "surface": "agent_studio",
+        "entrypoint": "declarative",
+        "metadata": {
+          "protocol": "autotask.ui-panel.v1",
+          "panel": {
+            "id": "repository_review",
+            "title": "Repository review",
+            "description": "Create a review task for a repository and selected mode.",
+            "components": [
+              {
+                "type": "text",
+                "id": "repository",
+                "label": "Repository",
+                "required": true,
+                "max_length": 200
+              },
+              {
+                "type": "select",
+                "id": "mode",
+                "label": "Mode",
+                "required": true,
+                "options": [
+                  {"value": "review", "label": "Review"},
+                  {"value": "audit", "label": "Audit"}
+                ],
+                "default": "review"
+              },
+              {
+                "type": "toggle",
+                "id": "include_tests",
+                "label": "Include tests",
+                "default": true
+              }
+            ],
+            "actions": [
+              {
+                "id": "create_task",
+                "type": "create_task",
+                "label": "Create task",
+                "title_template": "Review {repository}",
+                "description_template": "Mode: {mode}; include tests: {include_tests}",
+                "profile_field": "profile_id"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

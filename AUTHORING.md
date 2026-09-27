@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, public Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md), [remote-channel-example](remote-channel-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, fixed OpenAI-compatible LLM Provider descriptors, personal memory providers using Streamable HTTP, and declarative Agent Studio UI panels. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks and source-integrated/public Channels remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [llm-provider-example](llm-provider-example/README.md), [memory-mcp](memory-mcp/README.md), [ui-panel-example](ui-panel-example/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md), [remote-channel-example](remote-channel-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
 
 ## Agent configuration adapters
 
@@ -32,11 +32,14 @@ python3 -m unittest discover -s memory-mcp -v
 python3 -m unittest discover -s remote-tool-provider -v
 python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
+python3 -m unittest discover -s llm-provider-example -v
 python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
 python3 -m unittest discover -s channel-provider-example -v
 python3 -m unittest discover -s remote-channel-example -v
+python3 -m unittest discover -s ui-panel-example -v
+python3 -m unittest discover -s executor-plugin-example -v
 python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```
@@ -92,6 +95,52 @@ autotask plugin submit --manifest ./autotask-skill-provider.json --json
 The provider API key is configured by each installer after publication. Pagination,
 incremental deletion, arbitrary files and private upstream credentials are outside
 the first public Skill Provider contract.
+
+The [`llm-provider-example`](llm-provider-example/README.md) is a fixed Gateway
+descriptor rather than a remote tool server. It declares one reviewed HTTPS
+OpenAI-compatible base URL, up to 32 static model IDs and bounded configuration
+fields. The author does not ship code, a model-discovery endpoint, prices,
+proxy settings or credentials. Installers enter the API key in the encrypted
+plugin connection form; changing the model list requires a reviewed version.
+
+## Declarative Agent Studio UI panel
+
+[`ui-panel-example`](ui-panel-example/README.md) is the public UI extension path.
+It declares one hosted `autotask.ui-panel.v1` runtime and a fixed
+`capabilities.ui_extensions` descriptor. The current host supports text,
+textarea, select and toggle fields and one `create_task` action. Templates can
+reference only declared component IDs; the server validates the manifest again
+at installation and invocation, enforces `task:create`, records an audit event,
+and treats a repeated request ID as an idempotent retry.
+
+The panel is rendered by the AutoTask Agent Studio host. An author cannot ship
+arbitrary JavaScript, HTML, CSS, iframe content, REST callbacks or credentials
+inside this contract. Prepare and submit it with:
+
+```sh
+python3 ui-panel-example/prepare.py --author-id 42 --out /tmp/autotask-ui-panel.json
+autotask plugin submit --manifest /tmp/autotask-ui-panel.json --dry-run
+```
+
+After publication, a consumer installs the plugin in a workspace, binds an
+Agent Profile, opens its Agent Studio subpage and creates a task from the form.
+Personal scope does not accept UI panels in this release.
+
+## Worker executor plugins
+
+[`executor-plugin-example`](executor-plugin-example/README.md) documents a
+different trust boundary. `capabilities.executors[]` is consumed by the Rust
+Worker's generic `headless_stdio_v1` driver and is registered through the
+administrator-only `/api/v1/admin/executor-plugins` API. It is not accepted by
+`plugin submit`, because selecting an executor changes task dispatch and may
+run a host-supplied binary inside the full-runtime container.
+
+The administrator must validate the manifest, upload a matching content-
+addressed artifact when needed, and push the enabled definition to Workers.
+The Worker verifies protocol, paths, checksum and optional signature before it
+binds the executor. A rejected definition is not used for dispatch. Public
+third-party authors should use a remote MCP or declarative UI panel instead of
+requesting executor access.
 
 ## Local CLI Tool example
 

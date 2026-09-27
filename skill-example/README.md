@@ -9,15 +9,27 @@ python3 -m unittest discover -s skill-example -v
 python3 skill-example/validate.py
 ```
 
-`manifest.template.json` documents the catalog shape for a Skill capability. It
-is intentionally marked `projected_read_only` and `source_kind=personal`: this
-sample is for a private/workspace installation and materialization exercise.
-The public `plugin submit` endpoint currently accepts remote HTTPS MCP tools and
-personal memory providers, not Skill bundles. Do not submit this manifest as if
-it were a public listing.
+`manifest.template.json` documents the public `skill_pack` catalog shape. The
+bundle embeds `SKILL.md`, `autotask-skill.json`, and bounded UTF-8 reference
+files in the immutable plugin version, so Platform review sees the exact
+content that a Worker will receive. It contains no command, URL, credential,
+archive, or executable file.
 
-To prove a real Skill installation, import the bundle into a private catalog,
-enable it on an Agent Profile, run a review task, and inspect the materialized
+Generate your author namespace and validate the submission shape:
+
+```sh
+python3 skill-example/prepare.py --author-id <your-user-id>
+python3 skill-example/validate.py --manifest autotask-skill-pack.json
+autotask plugin submit --manifest ./autotask-skill-pack.json --dry-run
+autotask plugin submit --manifest ./autotask-skill-pack.json --json
+```
+
+The platform reviewer must publish the submission before another workspace can
+install it. `source_kind=native` describes the embedded bundle; it does not
+grant the author executable code or an external runtime.
+
+To prove a real Skill installation, install the reviewed plugin, bind its Skill
+capability to an Agent Profile, run a review task, and inspect the materialized
 version plus the `repository_review` artifact. Passing this local validator only
 proves bundle shape; it does not prove runtime materialization or artifact
 creation.

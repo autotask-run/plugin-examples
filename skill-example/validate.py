@@ -7,7 +7,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-MAX_FILE_BYTES = 128 * 1024
+MAX_FILE_BYTES = 32 * 1024
+MAX_BUNDLE_BYTES = 128 * 1024
+MAX_FILES = 8
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 
 
@@ -88,27 +90,71 @@ def validate_bundle(skill_path: Path, manifest_path: Path) -> list[str]:
     except (OSError, UnicodeError, ValueError) as exc:
         return errors + [str(exc)]
     try:
-        capability = manifest["capabilities"]["skills"]
-        if len(capability) != 1:
+        classification = manifest["classification"]
+        if classification.get("plugin_kind") != "skill_pack":
+            errors.append("manifest classification.plugin_kind must be skill_pack")
+        if classification.get("source_kind") != "native":
+            errors.append("reference manifest source_kind must be native")
+        if classification.get("runtime_kinds") != ["skill"]:
+            errors.append("manifest classification.runtime_kinds must be ['skill']")
+        runtimes = manifest["runtimes"]
+        if runtimes != [{"runtime_id": "bundle", "kind": "skill", "protocol": "autotask.skill-bundle.v1"}]:
+            errors.append("manifest runtimes must declare the bundle skill runtime")
+        capabilities = manifest["capabilities"]
+        skill_capabilities = capabilities["skills"]
+        if len(skill_capabilities) != 1:
             errors.append("manifest must contain exactly one skill capability")
         else:
-            skill = capability[0]
+            skill = skill_capabilities[0]
             checks = {
-                "skill_id": "example/repository-review",
-                "version": "1.0.0",
-                "entrypoint": "agent_profile",
-                "bundle_ref": "./",
-                "support_level": "projected_read_only",
+                "name": "example/repository-review",
+                "runtime_id": "bundle",
+                "runtime_kind": "skill",
+                "support_level": "closed_loop_supported",
             }
             for key, expected in checks.items():
                 if skill.get(key) != expected:
                     errors.append(f"manifest skills[0].{key} must be {expected!r}")
-            if skill.get("required_tools") != frontmatter.get("tools"):
-                errors.append("manifest required_tools must match SKILL.md tools")
-        if manifest["classification"]["plugin_kind"] != "skill_pack":
-            errors.append("manifest classification.plugin_kind must be skill_pack")
-        if manifest["classification"]["source_kind"] != "personal":
-            errors.append("reference manifest source_kind must be personal")
+            if skill.get("permissions") != ["workspace_scoped"]:
+                errors.append("manifest skills[0].permissions must be ['workspace_scoped']")
+            bundle = skill.get("metadata", {}).get("skill_bundle", {})
+            if bundle.get("schema_version") != "autotask.skill-bundle.v1":
+                errors.append("skill_bundle.schema_version must be autotask.skill-bundle.v1")
+            if bundle.get("readme_content") != skill_path.read_text(encoding="utf-8"):
+                errors.append("skill_bundle.readme_content must match SKILL.md")
+            declared_manifest_path = skill_path.parent / "autotask-skill.json"
+            if not declared_manifest_path.exists():
+                declared_manifest_path = manifest_path.parent / "autotask-skill.json"
+            declared_skill_manifest = json.loads(declared_manifest_path.read_text(encoding="utf-8"))
+            if bundle.get("manifest") != declared_skill_manifest:
+                errors.append("skill_bundle.manifest must match autotask-skill.json")
+            files = bundle.get("files")
+            if not isinstance(files, list) or len(files) > MAX_FILES:
+                errors.append("skill_bundle.files must contain at most 8 files")
+            seen = set()
+            bundle_bytes = len(bundle.get("readme_content", "").encode("utf-8")) + len(json.dumps(declared_skill_manifest, ensure_ascii=False).encode("utf-8"))
+            for index, file in enumerate(files or []):
+                if set(file) != {"path", "content"}:
+                    errors.append(f"skill_bundle.files[{index}] must contain only path and content")
+                    continue
+                path = file.get("path", "")
+                parts = path.split("/") if isinstance(path, str) else []
+                if not path or path.startswith("/") or "\\" in path or "://" in path or any(part in ("", ".", "..") for part in parts):
+                    errors.append(f"skill_bundle.files[{index}].path is not a safe relative path")
+                if path in ("SKILL.md", "autotask-skill.json") or path in seen:
+                    errors.append(f"skill_bundle.files[{index}].path is reserved or duplicated")
+                seen.add(path)
+                content = file.get("content")
+                if not isinstance(content, str) or len(content.encode("utf-8")) > MAX_FILE_BYTES:
+                    errors.append(f"skill_bundle.files[{index}].content exceeds the example file limit")
+                bundle_bytes += len(str(path).encode("utf-8")) + len(content.encode("utf-8")) if isinstance(content, str) else 0
+            if bundle_bytes > MAX_BUNDLE_BYTES:
+                errors.append("skill_bundle content exceeds the 128 KiB example limit")
+            for key in ("bundle_ref", "entrypoint", "command", "url", "source_url", "repository", "dependencies", "install", "install_command"):
+                if key in bundle.get("manifest", {}):
+                    errors.append(f"skill_bundle.manifest cannot contain {key}")
+            if skill.get("required_tools") is not None:
+                errors.append("manifest skills[0].required_tools is not part of the embedded contract")
     except (KeyError, TypeError, IndexError) as exc:
         errors.append(f"manifest shape is incomplete: {exc}")
     return errors

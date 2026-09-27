@@ -25,11 +25,22 @@ class SkillBundleTest(unittest.TestCase):
     def test_absolute_bundle_reference_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             manifest = json.loads((ROOT / "manifest.template.json").read_text())
-            manifest["capabilities"]["skills"][0]["bundle_ref"] = "/tmp/skill"
+            manifest["capabilities"]["skills"][0]["metadata"]["skill_bundle"]["manifest"]["bundle_ref"] = "/tmp/skill"
             path = Path(directory) / "manifest.json"
             path.write_text(json.dumps(manifest))
             errors = validate_bundle(ROOT / "SKILL.md", path)
             self.assertTrue(any("bundle_ref" in error for error in errors), errors)
+
+    def test_executable_file_metadata_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            manifest = json.loads((ROOT / "manifest.template.json").read_text())
+            manifest["capabilities"]["skills"][0]["metadata"]["skill_bundle"]["files"].append(
+                {"path": "scripts/check.sh", "content": "echo unsafe", "executable": False}
+            )
+            path = Path(directory) / "manifest.json"
+            path.write_text(json.dumps(manifest))
+            errors = validate_bundle(ROOT / "SKILL.md", path)
+            self.assertTrue(any("only path and content" in error for error in errors), errors)
 
     def test_cli_validation(self):
         result = subprocess.run([sys.executable, str(ROOT / "validate.py")], capture_output=True, text=True, check=False)

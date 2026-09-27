@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md) and [local-tool-example](local-tool-example/README.md) for provider contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md) and [slash-command-example](slash-command-example/README.md) for provider and private extension contracts.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -17,6 +17,8 @@ python3 -m unittest discover -s remote-tool-provider -v
 python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
 python3 -m unittest discover -s local-tool-example -v
+python3 -m unittest discover -s hook-example -v
+python3 -m unittest discover -s slash-command-example -v
 python3 remote-mcp/server.py
 ```
 

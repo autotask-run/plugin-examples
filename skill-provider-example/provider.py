@@ -156,6 +156,7 @@ def sync(request: dict[str, Any]) -> dict[str, Any]:
         "records": records,
         "removed_external_ids": [],
         "cursor": {"revision": REVISION, "offset": len(records)},
+        "revision": REVISION,
         "complete": complete,
         "diagnostics": {"items_seen": len(records), "warnings": warnings},
     }

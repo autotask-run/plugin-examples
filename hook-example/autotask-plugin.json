@@ -1,0 +1,62 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "example/task-delivery-review",
+    "name": "task-delivery-review",
+    "display_name": "Task Delivery Review Hook",
+    "description": "Inject a delivery-review prompt after a task completes.",
+    "version": "0.1.0",
+    "author": {"name": "AutoTask example"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT",
+    "tags": ["hook", "prompt", "example"]
+  },
+  "classification": {
+    "plugin_kind": "hook_provider",
+    "source_kind": "workspace",
+    "stability": "experimental",
+    "runtime_kinds": ["system_hook"],
+    "categories": ["hooks"]
+  },
+  "runtimes": [{"runtime_id": "system-hook", "kind": "system_hook"}],
+  "permissions": [],
+  "capabilities": {
+    "hooks": [
+      {
+        "name": "delivery-review",
+        "title": "Delivery review",
+        "description": "Ask the Agent to check the completed task's delivery evidence.",
+        "runtime_id": "system-hook",
+        "runtime_kind": "system_hook",
+        "support_level": "supported",
+        "risk_level": "low",
+        "schema_version": "autotask.hook.v1",
+        "event": "TaskCompleted",
+        "matcher": {
+          "all": [
+            {"path": "session.status", "op": "eq", "value": "completed"}
+          ]
+        },
+        "effects_allowed": ["session.message.create", "audit.record"],
+        "timeout_seconds": 30,
+        "failure_policy": "fail_open",
+        "handlers": [
+          {
+            "type": "prompt",
+            "name": "inject-delivery-review",
+            "template": "Task {{task_id}} completed. Review the delivered result for missing tests, unresolved risks, and user-visible follow-up actions. Report only concrete findings with evidence; do not write memory automatically.",
+            "effect": {
+              "type": "session.message.create",
+              "placement": "new_message",
+              "role": "user"
+            },
+            "message_key_template": "hook-{{binding.id}}-delivery-review-{{session.id}}"
+          }
+        ],
+        "supported_binding_targets": ["agent_profile"],
+        "metadata": {"example_kind": "delivery_review"}
+      }
+    ]
+  },
+  "configuration": {"defaults": {}}
+}

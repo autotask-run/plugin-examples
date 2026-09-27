@@ -1,0 +1,49 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "example/task-delivery-review-command",
+    "name": "task-delivery-review-command",
+    "display_name": "Task Delivery Review Command",
+    "description": "Prompt command for reviewing delivery evidence in the current session.",
+    "version": "0.1.0",
+    "author": {"name": "AutoTask example"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT",
+    "tags": ["slash-command", "prompt", "example"]
+  },
+  "classification": {
+    "plugin_kind": "slash_command",
+    "source_kind": "workspace",
+    "stability": "experimental",
+    "runtime_kinds": ["go_builtin"],
+    "categories": ["slash_commands"]
+  },
+  "runtimes": [{"runtime_id": "agent-session", "kind": "go_builtin"}],
+  "permissions": [],
+  "capabilities": {
+    "slash_commands": [
+      {
+        "name": "delivery-review",
+        "title": "Delivery review",
+        "description": "Ask the current Agent Session to review delivery evidence.",
+        "runtime_id": "agent-session",
+        "runtime_kind": "go_builtin",
+        "support_level": "slash_command_supported",
+        "risk_level": "low",
+        "handler": "prompt",
+        "arguments_schema": {
+          "type": "object",
+          "properties": {
+            "request": {"type": "string", "description": "Optional review focus; passed as raw text."}
+          }
+        },
+        "visible_in": ["ui", "cli"],
+        "requires_approval": false,
+        "metadata": {
+          "prompt": "Review the current task delivery. Check the final result, tests, evidence, and unresolved risks. Return concrete findings with a concise next action."
+        }
+      }
+    ]
+  },
+  "configuration": {"defaults": {}}
+}

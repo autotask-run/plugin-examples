@@ -2,7 +2,23 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md) and [channel-provider-example](channel-provider-example/README.md) for provider and private extension contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
+
+## Agent configuration adapters
+
+The [agent-adapter-example](agent-adapter-example/README.md) is a complete
+local example for `autotask config setup`. An adapter is a trusted child
+process that reads one JSONL request and returns one setup plan; it configures a
+third-party client's MCP/Gateway file and does not execute an Agent. The CLI
+owns home-directory path checks, format validation, atomic writes and
+credentials. The adapter receives existing configuration content, which may
+contain client secrets, so install only code you trust.
+
+Run its standard-library tests, then generate a machine-local manifest with
+`prepare.py` and use `autotask config setup example.agent --dry-run`. Signed
+Plugin Store packages use the same protocol after Ed25519 integrity and local
+trust-key verification. Executable adapters are not ordinary public
+`plugin submit` entries in this release.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -20,6 +36,7 @@ python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
 python3 -m unittest discover -s channel-provider-example -v
+python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```
 

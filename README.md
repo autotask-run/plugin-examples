@@ -25,6 +25,12 @@ It is a loopback Go template for the in-process Provider/Runtime Driver
 interfaces, not a standalone service or a public submission. Independent
 Channel distribution requires a future Remote Channel Bridge.
 
+For a local or signed Plugin Store Agent configuration adapter, see
+[agent-adapter-example](agent-adapter-example). It implements the CLI's
+`autotask.agent-adapter.v1` manifest and JSONL protocol; it configures a client
+and does not execute an Agent. Executable Agent adapters are trusted local/Store
+code and are not in the ordinary public `plugin submit` allowlist.
+
 ```sh
 git clone https://github.com/autotask-run/plugin-examples.git
 cd plugin-examples
@@ -38,6 +44,7 @@ python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
 python3 -m unittest discover -s channel-provider-example -v
+python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```
 
@@ -61,6 +68,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 | [hook-example/](hook-example) | Workspace-private `autotask.hook.v1` prompt Hook and lifecycle steps |
 | [slash-command-example/](slash-command-example) | Workspace-private prompt Slash Command, raw args and ambiguity rules |
 | [channel-provider-example/](channel-provider-example) | Source-integrated loopback Channel manifest and Go Provider/Driver template |
+| [agent-adapter-example/](agent-adapter-example) | Local Agent configuration adapter, JSONL protocol, manifest preparation and preservation tests |
 
 The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.
 

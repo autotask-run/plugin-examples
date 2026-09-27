@@ -14,15 +14,9 @@ def main():
     if args.author_id < 1:
         parser.error("--author-id must be positive")
     manifest = json.loads(Path(__file__).with_name("manifest.template.json").read_text())
-    replacements = {
-        "__AUTHOR_ID__": str(args.author_id),
-        "__AUTHOR_NAME__": args.author_name,
-        "__AUTHOR_HANDLE__": args.author_handle,
-    }
-    encoded = json.dumps(manifest)
-    for source, target in replacements.items():
-        encoded = encoded.replace(source, target)
-    manifest = json.loads(encoded)
+    manifest["identity"]["plugin_id"] = f"user-{args.author_id}/repository-review-panel"
+    manifest["identity"]["author"]["name"] = args.author_name
+    manifest["identity"]["author"]["url"] = f"https://github.com/{args.author_handle}"
     Path(args.out).write_text(json.dumps(manifest, indent=2) + "\n")
     print(args.out)
 

@@ -35,13 +35,14 @@ class UIPanelManifestTest(unittest.TestCase):
 
             original = sys.argv
             try:
-                sys.argv = ["prepare.py", "--author-id", "42", "--author-name", "A", "--author-handle", "a", "--out", str(output)]
+                sys.argv = ["prepare.py", "--author-id", "42", "--author-name", "A \"quoted\" author", "--author-handle", "a", "--out", str(output)]
                 prepare.main()
             finally:
                 sys.argv = original
             manifest = json.loads(output.read_text())
             self.assertEqual(manifest["identity"]["plugin_id"], "user-42/repository-review-panel")
-            self.assertEqual(manifest["identity"]["author"]["name"], "A")
+            self.assertEqual(manifest["identity"]["author"]["name"], 'A "quoted" author')
+            self.assertEqual(manifest["identity"]["author"]["url"], "https://github.com/a")
             self.assertNotIn("__AUTHOR_", output.read_text())
 
 

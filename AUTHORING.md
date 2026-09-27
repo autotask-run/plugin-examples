@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, public Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md), [remote-channel-example](remote-channel-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
 
 ## Agent configuration adapters
 
@@ -36,6 +36,7 @@ python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
 python3 -m unittest discover -s channel-provider-example -v
+python3 -m unittest discover -s remote-channel-example -v
 python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```
@@ -239,10 +240,49 @@ Channel through the Channels module and bind an Agent Profile after the Go
 Provider and Driver are registered.
 
 The manifest is not accepted by `plugin submit`; `webhook_schema` does not open
-a public callback; and `plugin publish --scope workspace` stores metadata only.
-Independent author distribution needs a separately reviewed Remote Channel
-Bridge with credentials, signatures, replay protection, tenant isolation and
+a public callback. The workspace-private Remote Channel Bridge below provides
+the runnable independent adapter path; public marketplace distribution still
+needs a separate review of credentials, replay protection, tenant isolation and
 idempotency.
+
+## Workspace-private Remote Channel Bridge
+
+[`remote-channel-example`](remote-channel-example) is the runnable private path
+for an author who wants to host a channel adapter without adding Go code to the
+AutoTask Server. It implements the bounded `autotask.channel.v1` contract over
+Streamable HTTP MCP:
+
+- `bridge_poll` receives the server-generated `instance_key`, an opaque cursor,
+  a bounded page size and non-secret `adapter_config`; it returns normalized text
+  events and the next cursor.
+- `bridge_send` receives a stable `delivery_id`; the example rejects reuse with a
+  different payload so retries cannot duplicate a reply.
+- AutoTask persists cursor, inbox, outbox and leases. Delivery is at-least-once,
+  so a production adapter must make both event IDs and delivery IDs idempotent.
+
+Run its offline protocol tests with:
+
+```bash
+python3 -m unittest discover -s remote-channel-example -v
+```
+
+Prepare a workspace-private manifest after hosting the endpoint behind HTTPS:
+
+```bash
+python3 remote-channel-example/prepare.py \
+  --author-id 42 \
+  --url https://bridge.example.com/mcp \
+  --out /tmp/autotask-remote-channel.json
+```
+
+Publish with `plugin publish --scope workspace`, install the version, and put
+only non-secret tenant or queue values under `channel_config`. API Key/OAuth is
+declared in the manifest and connected through the installation authorization
+flow; never put credentials in the manifest or adapter config. The protocol
+currently carries text turns only and does not expose Slash Commands, cards,
+attachments or a public webhook. `plugin submit` rejects `channel_provider`
+until the platform separately reviews identity mapping, recovery and
+platform-specific behavior.
 
 ## REST alternative
 

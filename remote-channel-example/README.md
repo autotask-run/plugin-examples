@@ -19,7 +19,9 @@ python3 -m unittest discover -s remote-channel-example -v
 python3 remote-channel-example/server.py
 ```
 
-Prepare a workspace-private manifest after hosting the service behind HTTPS:
+Prepare a workspace-private manifest after hosting the service behind HTTPS.
+The generated `workspace-<author_id>/` namespace is a local example namespace;
+choose your own workspace-owned slug for a real installation:
 
 ```sh
 python3 remote-channel-example/prepare.py \
@@ -27,6 +29,11 @@ python3 remote-channel-example/prepare.py \
   --url https://bridge.example.com/mcp \
   --out /tmp/autotask-remote-channel.json
 ```
+
+For an installer-provided API key, use `--auth-type api_key --api-key-header
+X-Bridge-Key --api-key-prefix 'Bearer '`. For OAuth, use
+`--auth-type oauth --oauth-scope messages:read --oauth-scope messages:write`.
+These flags declare the authorization shape only; they never add a credential.
 
 Install the plugin in a workspace, configure the `remote_bridge` capability with a
 channel name and optional non-secret `channel_config`, then connect the declared

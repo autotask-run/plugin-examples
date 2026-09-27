@@ -19,7 +19,7 @@
     "categories": ["channel", "remote-mcp"]
   },
   "runtimes": [{"runtime_id": "remote_bridge", "kind": "mcp", "protocol": "mcp"}],
-  "permissions": ["network:bridge.example.com"],
+  "permissions": [{"permission": "network:bridge.example.com", "risk_level": "medium"}],
   "capabilities": {
     "channels": [{
       "name": "remote_bridge",

@@ -41,6 +41,7 @@ python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
 python3 -m unittest discover -s channel-provider-example -v
+python3 -m unittest discover -s remote-channel-example -v
 python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```

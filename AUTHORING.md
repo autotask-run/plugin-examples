@@ -289,25 +289,27 @@ Channel through the Channels module and bind an Agent Profile after the Go
 Provider and Driver are registered.
 
 The manifest is not accepted by `plugin submit`; `webhook_schema` does not open
-a public callback. The workspace-private Remote Channel Bridge below provides
-the runnable independent adapter path; public marketplace distribution still
+a public callback. The Remote Channel Bridge below is currently an adapter
+fixture only; the AutoTask Server does not yet provide its generic polling,
+identity, inbox/outbox or recovery runtime. Public marketplace distribution
 needs a separate review of credentials, replay protection, tenant isolation and
 idempotency.
 
 ## Workspace-private Remote Channel Bridge
 
-[`remote-channel-example`](remote-channel-example) is the runnable private path
-for an author who wants to host a channel adapter without adding Go code to the
-AutoTask Server. It implements the bounded `autotask.channel.v1` contract over
-Streamable HTTP MCP:
+[`remote-channel-example`](remote-channel-example) is a runnable adapter
+fixture for an author who wants to test the proposed channel contract without
+adding Go code to the AutoTask Server. It implements the bounded
+`autotask.channel.v1` contract over Streamable HTTP MCP:
 
 - `bridge_poll` receives the server-generated `instance_key`, an opaque cursor,
   a bounded page size and non-secret `adapter_config`; it returns normalized text
   events and the next cursor.
 - `bridge_send` receives a stable `delivery_id`; the example rejects reuse with a
   different payload so retries cannot duplicate a reply.
-- AutoTask persists cursor, inbox, outbox and leases. Delivery is at-least-once,
-  so a production adapter must make both event IDs and delivery IDs idempotent.
+- AutoTask does not yet persist cursor, inbox, outbox or leases for this
+  contract. A complete platform implementation must make reception durable
+  before advancing the cursor and must retry an immutable delivery ID.
 
 Run its offline protocol tests with:
 
@@ -315,7 +317,8 @@ Run its offline protocol tests with:
 python3 -m unittest discover -s remote-channel-example -v
 ```
 
-Prepare a workspace-private manifest after hosting the endpoint behind HTTPS:
+Prepare the illustrative workspace-private manifest after hosting the endpoint
+behind HTTPS:
 
 ```bash
 python3 remote-channel-example/prepare.py \
@@ -324,14 +327,12 @@ python3 remote-channel-example/prepare.py \
   --out /tmp/autotask-remote-channel.json
 ```
 
-Publish with `plugin publish --scope workspace`, install the version, and put
-only non-secret tenant or queue values under `channel_config`. API Key/OAuth is
-declared in the manifest and connected through the installation authorization
-flow; never put credentials in the manifest or adapter config. The protocol
+Do not publish or install this manifest against the current server. The protocol
 currently carries text turns only and does not expose Slash Commands, cards,
 attachments or a public webhook. `plugin submit` rejects `channel_provider`
-until the platform separately reviews identity mapping, recovery and
-platform-specific behavior.
+until the platform separately reviews identity mapping, durable recovery and
+platform-specific behavior. API Key/OAuth belongs in the future installation
+authorization flow; never put credentials in the manifest or adapter config.
 
 ## REST alternative
 

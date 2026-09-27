@@ -1,16 +1,20 @@
 # Remote Channel Bridge example
 
-This is a dependency-free Python MCP adapter for a **workspace-private** AutoTask
-Channel. It demonstrates `autotask.channel.v1`:
+This is a dependency-free Python MCP adapter fixture for the proposed
+`autotask.channel.v1` contract. It demonstrates the adapter side of a
+**workspace-private** Remote Channel Bridge:
 
 - `bridge_poll` returns bounded normalized text events and an opaque cursor.
 - `bridge_send` accepts a `delivery_id` and rejects reuse with a different payload.
-- AutoTask persists the cursor and inbound/outbound state; the adapter must still
-  persist its own upstream cursor and make delivery IDs idempotent in production.
+- The current AutoTask Server does not yet run this generic Bridge or persist
+  its cursor/inbox/outbox state. The example therefore tests only the adapter
+  protocol; a production integration still needs the platform state machine,
+  identity binding and crash-recovery work.
 
-It is not a public `plugin submit` example in this release. The public authoring
-allowlist still excludes Channel Bridge until the platform completes independent
-review of identity mapping, recovery, and platform-specific adapter behavior.
+It is not installable or accepted by `plugin submit` in this release. The public
+authoring allowlist excludes Channel Bridge until the platform completes
+independent review of identity mapping, durable recovery and platform-specific
+adapter behavior.
 
 Run the offline HTTP tests:
 
@@ -35,10 +39,9 @@ X-Bridge-Key --api-key-prefix 'Bearer '`. For OAuth, use
 `--auth-type oauth --oauth-scope messages:read --oauth-scope messages:write`.
 These flags declare the authorization shape only; they never add a credential.
 
-Install the plugin in a workspace, configure the `remote_bridge` capability with a
-channel name and optional non-secret `channel_config`, then connect the declared
-API Key/OAuth authorization through the plugin installation authorization UI/API.
-Never put a token in `channel_config` or in the manifest. The platform sends the
-server-generated `instance_key`, bounded cursor, and stable delivery IDs to the
-adapter; it derives workspace and user identity through the installed Channel
-binding and never trusts adapter-provided workspace IDs.
+The generated manifest documents the future workspace-private shape. Do not
+publish or install it against the current server. Never put a token in
+`channel_config` or in the manifest. When the platform Bridge is implemented,
+it must generate the `instance_key`, own the bounded cursor and delivery IDs,
+and derive workspace/user identity from the installed Channel binding rather
+than trusting adapter-provided workspace IDs.

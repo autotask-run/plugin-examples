@@ -1,0 +1,45 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-7/docs-source",
+    "name": "docs-source",
+    "description": "A remote MCP Knowledge Source Provider with bounded text documents.",
+    "version": "1.0.0",
+    "author": {"name": "Example author"},
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT"
+  },
+  "classification": {"plugin_kind": "knowledge_provider", "source_kind": "native", "runtime_kinds": ["mcp"]},
+  "runtimes": [{"runtime_id": "docs-source", "kind": "mcp", "protocol": "mcp"}],
+  "permissions": [{"permission": "network:docs.example.com"}],
+  "capabilities": {
+    "knowledge_sources": [{
+      "name": "docs_source",
+      "title": "Remote Knowledge Source",
+      "description": "Synchronize bounded text documents into an AutoTask Knowledge Base.",
+      "runtime_id": "docs-source",
+      "runtime_kind": "mcp",
+      "support_level": "executable_existing_runtime",
+      "risk_level": "medium",
+      "permissions": ["network:docs.example.com"],
+      "provider_id": "example-docs-source",
+      "source_kinds": ["documentation"],
+      "config_schema": {
+        "type": "object",
+        "properties": {"collection": {"type": "string", "pattern": "^[a-z0-9_-]{1,64}$", "default": "docs"}},
+        "additionalProperties": false
+      },
+      "operations": {"validate_config": "knowledge_validate_config", "sync_documents": "knowledge_sync_documents"},
+      "sync_modes": ["cursor"],
+      "max_items_default": 100,
+      "metadata": {
+        "protocol": "autotask.knowledge-source.v1",
+        "mcp_server": {
+          "name": "example-docs-source",
+          "config": {"url": "https://docs.example.com/provider-mcp", "transport": "streamable-http"},
+          "auth": {"type": "api_key", "header": "Authorization", "prefix": "Bearer "}
+        }
+      }
+    }]
+  }
+}

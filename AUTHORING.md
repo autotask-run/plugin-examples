@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md) and [memory-mcp](memory-mcp/README.md) for provider contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md) and [local-tool-example](local-tool-example/README.md) for provider contracts.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -16,6 +16,7 @@ python3 -m unittest discover -s memory-mcp -v
 python3 -m unittest discover -s remote-tool-provider -v
 python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
+python3 -m unittest discover -s local-tool-example -v
 python3 remote-mcp/server.py
 ```
 
@@ -70,6 +71,43 @@ autotask plugin submit --manifest ./autotask-skill-provider.json --json
 The provider API key is configured by each installer after publication. Pagination,
 incremental deletion, arbitrary files and private upstream credentials are outside
 the first public Skill Provider contract.
+
+## Local CLI Tool example
+
+[`local-tool-example`](local-tool-example/README.md) is the reference path for
+an author who wants to develop and use a plugin on their own computer without
+listing it in the public market. It uses the canonical `autotask.plugin.v1`
+manifest with one `cli_stdio_json` runtime and the `stdio-json-v1` stdin/stdout
+protocol. The CLI starts the declared process in the manifest directory for the
+current `run-local` task; the process reads one JSON request and writes one JSON
+result.
+
+Run the offline protocol tests and inspect the manifest before connecting it to
+an AutoTask server:
+
+```sh
+python3 -m unittest discover -s local-tool-example -v
+autotask doctor --local-plugin ./local-tool-example/autotask-plugin.json
+autotask run-local "Use plugin.text_stats once" \
+  --local-plugin ./local-tool-example/autotask-plugin.json \
+  --local-tools plugin.text_stats \
+  --sandbox read-only --non-interactive --json
+```
+
+The example's tool is pure computation and therefore declares `low` risk,
+`read-only`, and `requires_approval=false`. A plugin that writes files,
+executes commands, controls a browser, reads credentials, or calls another
+service must declare the narrowest matching sandbox and approval policy and
+must enforce those checks inside its own process. The CLI validates the
+manifest, input/output schema, result status, timeout and trust boundary, but
+it cannot make an arbitrary host process safe by itself.
+
+The local path accepts a manifest file or a previously published workspace
+catalog entry. It is intentionally separate from public `plugin submit`: local
+executables are not copied into the reviewed remote MCP/Skill submission and
+are not started by web chat sessions. Use the public remote MCP, Provider,
+Memory Provider or static Skill Pack contracts when other workspaces must
+install the capability.
 
 ## Remote Tool Provider contract
 

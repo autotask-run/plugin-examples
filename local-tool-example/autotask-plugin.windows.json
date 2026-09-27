@@ -1,0 +1,59 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "com.example.text-tools",
+    "name": "text-tools",
+    "display_name": "Text Tools",
+    "version": "0.1.0",
+    "description": "Read-only text statistics for a local AutoTask CLI session."
+  },
+  "classification": {
+    "runtime_kinds": ["cli_stdio_json"]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "local-python",
+      "kind": "cli_stdio_json",
+      "protocol": "stdio-json-v1",
+      "entrypoint": {
+        "command": "local_tool.cmd",
+        "args": []
+      },
+      "isolation": {
+        "default_sandbox": "read-only"
+      }
+    }
+  ],
+  "capabilities": {
+    "tools": [
+      {
+        "name": "plugin.text_stats",
+        "description": "Count Unicode characters, words, and lines in text.",
+        "runtime_id": "local-python",
+        "input_schema": {
+          "type": "object",
+          "required": ["text"],
+          "properties": {
+            "text": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "required": ["status", "characters", "words", "lines"],
+          "properties": {
+            "status": {"const": "ok"},
+            "characters": {"type": "integer"},
+            "words": {"type": "integer"},
+            "lines": {"type": "integer"}
+          },
+          "additionalProperties": false
+        },
+        "risk_level": "low",
+        "requires_approval": false,
+        "content_kind": "json",
+        "timeout_ms": 5000
+      }
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` catalog contract and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Skill bundles and UI extensions remain outside this author submission release. The `skill-example` and `skill-provider-example` directories are reference fixtures for private/workspace development; they are not accepted by public `plugin submit` in this release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md) for catalog providers and [memory-mcp](memory-mcp/README.md) for memory.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, and personal memory providers using Streamable HTTP. Authors host the service; AutoTask distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md) and [memory-mcp](memory-mcp/README.md) for provider contracts.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -51,11 +51,25 @@ autotask plugin submissions --id 123 --json
 
 Omit `--draft-only` to create and submit in one command. If submission fails after saving, retry using the saved ID reported by the CLI.
 
-## Memory provider and private reference examples
+## Memory and Skill Provider examples
 
 The [`memory-mcp`](memory-mcp/README.md) example follows the public `autotask.memory.v1` contract. It is submitted with `plugin_kind=memory_provider`, then an installer supplies API Key/OAuth credentials and verifies create, search, correct and delete on a personal Profile.
 
-[`skill-example`](skill-example/README.md) and [`skill-provider-example`](skill-provider-example/README.md) document the current private/workspace shapes and local contract tests. Their manifests are deliberately marked reference-only. The platform does not currently accept `skill_pack` or `skill_provider` in the ordinary public submission endpoint, and a local validator cannot prove runtime materialization or catalog sync.
+[`skill-example`](skill-example/README.md) documents a private Skill bundle because static `skill_pack` submissions are not part of the public endpoint. [`skill-provider-example`](skill-provider-example/README.md) is different: it is a public remote MCP provider. It declares `plugin_kind=skill_provider`, exactly one `capabilities.skill_providers` entry, and the three bounded operations `validate_config`, `sync`, and `get_content`. The provider returns a complete snapshot with a revision; AutoTask validates and atomically applies it before a consumer explicitly installs and binds a Skill.
+
+Prepare the public Skill Provider manifest with:
+
+```sh
+python3 skill-provider-example/prepare.py \
+  --author-id 42 \
+  --url https://skills.example.com/provider-mcp
+autotask plugin submit --manifest ./autotask-skill-provider.json --dry-run
+autotask plugin submit --manifest ./autotask-skill-provider.json --json
+```
+
+The provider API key is configured by each installer after publication. Pagination,
+incremental deletion, arbitrary files and private upstream credentials are outside
+the first public Skill Provider contract.
 
 ## Remote Tool Provider contract
 

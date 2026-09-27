@@ -20,6 +20,11 @@ For workspace-private extensions, see [hook-example](hook-example) for a
 for a prompt Slash Command. These examples use existing server runtimes and
 are intentionally outside the public `plugin submit` allowlist.
 
+For a Channel source integration, see [channel-provider-example](channel-provider-example).
+It is a loopback Go template for the in-process Provider/Runtime Driver
+interfaces, not a standalone service or a public submission. Independent
+Channel distribution requires a future Remote Channel Bridge.
+
 ```sh
 git clone https://github.com/autotask-run/plugin-examples.git
 cd plugin-examples
@@ -31,6 +36,7 @@ python3 -m unittest discover -s skill-provider-example -v
 python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
+python3 -m unittest discover -s channel-provider-example -v
 python3 remote-mcp/server.py
 ```
 
@@ -52,6 +58,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 | [local-tool-example/](local-tool-example) | Local CLI `stdio-json-v1` tool, platform launch manifests, and sandbox tests |
 | [hook-example/](hook-example) | Workspace-private `autotask.hook.v1` prompt Hook and lifecycle steps |
 | [slash-command-example/](slash-command-example) | Workspace-private prompt Slash Command, raw args and ambiguity rules |
+| [channel-provider-example/](channel-provider-example) | Source-integrated loopback Channel manifest and Go Provider/Driver template |
 
 The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.
 

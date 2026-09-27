@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md) and [slash-command-example](slash-command-example/README.md) for provider and private extension contracts.
+Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, and personal memory providers using Streamable HTTP. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks, Channels, personal private Skill bundles and UI extensions remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [memory-mcp](memory-mcp/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md) and [channel-provider-example](channel-provider-example/README.md) for provider and private extension contracts.
 
 [Runnable examples](https://github.com/autotask-run/plugin-examples) · [Chinese guide](https://docs.autotask.run/docs/plugin-development.md) · [Manifest schema](remote-mcp/submission.schema.json)
 
@@ -19,6 +19,7 @@ python3 -m unittest discover -s skill-provider-example -v
 python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
+python3 -m unittest discover -s channel-provider-example -v
 python3 remote-mcp/server.py
 ```
 
@@ -196,6 +197,35 @@ autotask plugin enable --plugin-id user-42/text-stats --capability text_stats --
 ```
 
 Enable means install and bind. Start an **Agent task session** with that profile; ordinary chat sessions do not currently load third-party MCP tools. For a reproducible check, ask the Agent to call `text_stats` exactly once with `{"text":"你好 AutoTask\nPlugins work"}`. The tool call should contain both lines with no trailing newline and return `{"characters":24,"words":4,"lines":2}`. A text-only task may then ask for a code repository; choose **Continue without repository**. Check the actual tool-call event and result, not just installed status or MCP downlink. Remove bindings before uninstalling through plugin management.
+
+## Channel Provider source integration
+
+[`channel-provider-example`](channel-provider-example) is deliberately different
+from the public MCP examples. It contains a canonical `channel_provider`
+manifest and a Go Provider/Runtime Driver skeleton for a loopback fixture. The
+imports target AutoTask's `internal` packages, so the files must be copied into
+an AutoTask Server checkout and registered during startup; they are not a
+standalone SDK or service.
+
+Run its metadata checks with:
+
+```bash
+python3 -m unittest discover -s channel-provider-example -v
+```
+
+The host-side proof comes from the AutoTask repository's registry, Channel
+service, gateway and `server/internal/plugins/builtin/channeltest` runtime
+harness. A real adapter must normalize `ChannelMessage`, preserve channel-scoped
+external identity, suppress duplicate platform events, use the supplied
+`ChannelReply`, and keep secrets out of events and logs. Create/configure the
+Channel through the Channels module and bind an Agent Profile after the Go
+Provider and Driver are registered.
+
+The manifest is not accepted by `plugin submit`; `webhook_schema` does not open
+a public callback; and `plugin publish --scope workspace` stores metadata only.
+Independent author distribution needs a separately reviewed Remote Channel
+Bridge with credentials, signatures, replay protection, tenant isolation and
+idempotency.
 
 ## REST alternative
 

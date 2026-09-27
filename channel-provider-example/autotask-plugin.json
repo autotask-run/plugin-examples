@@ -1,0 +1,63 @@
+{
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "example/loopback-channel",
+    "name": "loopback-channel",
+    "display_name": "Loopback Channel Fixture",
+    "version": "0.1.0",
+    "description": "Source-integrated loopback Channel fixture for Provider and Driver tests.",
+    "author": {"name": "AutoTask"},
+    "repository": "https://github.com/autotask-run/plugin-examples/tree/main/channel-provider-example",
+    "license": "MIT",
+    "tags": ["channel", "source-integration", "fixture"]
+  },
+  "classification": {
+    "plugin_kind": "channel_provider",
+    "runtime_kinds": ["go_builtin"],
+    "source_kind": "workspace",
+    "stability": "experimental",
+    "categories": ["channels", "source-integration"]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "loopback",
+      "kind": "go_builtin",
+      "entrypoint": {"package": "internal/plugins/examples/loopbackchannel", "entry": "Register"}
+    }
+  ],
+  "permissions": [],
+  "capabilities": {
+    "channels": [
+      {
+        "name": "loopback",
+        "title": "Loopback Channel",
+        "description": "In-process test Channel that exercises normalized messages and replies.",
+        "runtime_id": "loopback",
+        "runtime_kind": "go_builtin",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "channel_id": "loopback",
+        "provider": "loopback",
+        "events": ["message.received", "reply.will_send", "reply.sent"],
+        "metadata": {
+          "connection_mode": "test_loopback",
+          "bot_kind": "loopback",
+          "capabilities": {
+            "direct_message": true,
+            "group_message": false,
+            "markdown": false,
+            "progress_update": false
+          },
+          "config_fields": [],
+          "user_identity": {
+            "external_id_fields": ["user_id"],
+            "tenant_id_fields": ["channel_id"],
+            "display_fields": ["display_name"],
+            "supports_mapping": true,
+            "channel_scoped": true
+          }
+        }
+      }
+    ]
+  }
+}

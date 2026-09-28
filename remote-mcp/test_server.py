@@ -54,6 +54,16 @@ class MCPTest(unittest.TestCase):
             self.assertEqual(error.exception.code, expected)
             error.exception.close()
 
+    def test_health_is_public_and_does_not_open_an_sse_stream(self):
+        health = self.url.replace('/mcp', '/health')
+        with urllib.request.urlopen(health, timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            self.assertEqual(json.load(response), {"status": "ok"})
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(self.url, timeout=3)
+        self.assertEqual(error.exception.code, 405)
+        error.exception.close()
+
 
 if __name__ == "__main__":
     unittest.main()

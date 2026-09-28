@@ -119,6 +119,9 @@ class Handler(BaseHTTPRequestHandler):
         self.respond(202 if response is None else 200, response)
 
     def do_GET(self):
+        if self.path == "/health":
+            self.respond(200, {"status": "ok"})
+            return
         # This stateless server does not offer an SSE stream.
         self.respond(403 if not self.valid_origin() else 405)
 

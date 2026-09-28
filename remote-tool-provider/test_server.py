@@ -38,6 +38,10 @@ class ToolProviderTest(unittest.TestCase):
         auth = {"Authorization": "Bearer test-provider-key"}
         _, initialized = self.call(self.provider_url, "initialize", {"protocolVersion": "2025-06-18"}, headers=auth)
         self.assertEqual(initialized["result"]["protocolVersion"], "2025-06-18")
+        _, listing = self.call(self.provider_url, "tools/list", headers=auth)
+        for tool in listing["result"]["tools"]:
+            self.assertIn("source_kind", tool["inputSchema"]["required"])
+            self.assertEqual(tool["inputSchema"]["properties"]["source_kind"]["const"], "remote_catalog")
         _, validated = self.call(self.provider_url, "tools/call", {"name": "provider_validate_config", "arguments": {"source_kind": "remote_catalog", "config": {}}}, headers=auth)
         self.assertTrue(validated["result"]["structuredContent"]["valid"])
         first = self.call(self.provider_url, "tools/call", {"name": "provider_sync_catalog", "arguments": {"source_kind": "remote_catalog", "cursor": {}, "limits": {"max_items": 1}}}, headers=auth)[1]["result"]["structuredContent"]

@@ -17,7 +17,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 BASE = "https://docs.autotask.run/examples/oauth-mcp"
 RESOURCE = BASE + "/mcp"
-CALLBACK = "https://app.autotask.run/api/v1/plugin-lifecycle/oauth/callback"
+CALLBACK = "https://api.autotask.run/api/v1/plugin-lifecycle/oauth/callback"
 CLIENT_ID = "autotask-plugin-acceptance"
 SCOPE = "read:demo"
 PROTOCOLS = ("2025-06-18", "2025-03-26")

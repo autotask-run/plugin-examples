@@ -42,13 +42,16 @@ class PublicSkillProviderMCPTest(unittest.TestCase):
         _, synced = self.call("tools/call", {"name": "skill_sync", "arguments": {"source_id": 7, "source_kind": "skill_catalog", "config": {}, "limits": {"max_items": 100}}})
         value = synced["result"]["structuredContent"]
         self.assertTrue(value["complete"])
-        self.assertEqual(value["revision"], "example-catalog-v1")
+        self.assertEqual(value["revision"], "example-catalog-v2")
         self.assertEqual(len(value["records"]), 2)
         self.assertNotIn("cursor", value)
         self.assertNotIn("removed_external_ids", value)
-        _, content = self.call("tools/call", {"name": "skill_get_content", "arguments": {"external_id": "example/release-checklist", "source_ref": {"revision": "example-catalog-v1"}}})
+        _, content = self.call("tools/call", {"name": "skill_get_content", "arguments": {"external_id": "example/release-checklist", "source_ref": {"revision": "example-catalog-v2"}}})
         content_value = content["result"]["structuredContent"]
-        self.assertEqual(content_value["revision"], "example-catalog-v1")
+        self.assertEqual(content_value["revision"], "example-catalog-v2")
+        self.assertIn("Confirm the release version", content_value["readme_content"])
+        self.assertIn("Record the test results", content_value["readme_content"])
+        self.assertIn("Write down the rollback artifact", content_value["readme_content"])
         self.assertNotIn("content_hash", content_value)
 
     def test_auth_boundary(self):

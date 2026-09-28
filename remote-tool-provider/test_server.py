@@ -44,9 +44,12 @@ class ToolProviderTest(unittest.TestCase):
         self.assertFalse(first["complete"])
         self.assertEqual(first["items"][0]["external_id"], "example.weather")
         self.assertNotIn("auth", first["items"][0]["package_manifest"])
+        self.assertIn("input_schema", first["items"][0]["tools"][0])
+        self.assertNotIn("inputSchema", first["items"][0]["tools"][0])
         second = self.call(self.provider_url, "tools/call", {"name": "provider_sync_catalog", "arguments": {"source_kind": "remote_catalog", "cursor": first["cursor"], "limits": {"max_items": 1}}}, headers=auth)[1]["result"]["structuredContent"]
         self.assertTrue(second["complete"])
         self.assertEqual(second["items"][0]["external_id"], "example.time")
+        self.assertIn("input_schema", second["items"][0]["tools"][0])
 
     def test_provider_key_boundary_and_item_is_credential_free(self):
         with self.assertRaises(urllib.error.HTTPError) as error:

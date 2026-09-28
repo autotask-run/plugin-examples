@@ -12,9 +12,20 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26")
 REVISION = "demo-1"
+PROVIDER_INPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "source_kind": {"type": "string", "const": "remote_catalog"},
+        "config": {"type": "object"},
+        "cursor": {"type": "object"},
+        "limits": {"type": "object"},
+    },
+    "required": ["source_kind"],
+    "additionalProperties": True,
+}
 PROVIDER_TOOLS = [
-    {"name": "provider_validate_config", "description": "Validate a Tool Source configuration.", "inputSchema": {"type": "object"}},
-    {"name": "provider_sync_catalog", "description": "Synchronize a paged MCP item catalog.", "inputSchema": {"type": "object"}},
+    {"name": "provider_validate_config", "description": "Validate a Tool Source configuration.", "inputSchema": PROVIDER_INPUT_SCHEMA},
+    {"name": "provider_sync_catalog", "description": "Synchronize a paged MCP item catalog.", "inputSchema": PROVIDER_INPUT_SCHEMA},
 ]
 ITEM_TOOLS = [{
     "name": "weather_lookup",

@@ -35,9 +35,9 @@ def issue_token(client_id, resource, scope):
     access = secrets.token_urlsafe(32)
     refresh = secrets.token_urlsafe(32)
     with LOCK:
-        ACCESS[access] = (client_id, resource, scope, time.time() + 15)
+        ACCESS[access] = (client_id, resource, scope, time.time() + 120)
         REFRESH[refresh] = (client_id, resource, scope)
-    return {"access_token": access, "refresh_token": refresh, "token_type": "Bearer", "expires_in": 15, "scope": scope}
+    return {"access_token": access, "refresh_token": refresh, "token_type": "Bearer", "expires_in": 120, "scope": scope}
 
 
 class Handler(BaseHTTPRequestHandler):

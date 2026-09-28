@@ -6,7 +6,7 @@ OAuth protocol path; it is **not** an authentication service for real data.
 The fixed public resource is `https://docs.autotask.run/examples/oauth-mcp/mcp`,
 the issuer is `https://docs.autotask.run/examples/oauth-mcp`, and the registered
 client ID is `autotask-plugin-acceptance`. Its only registered callback is
-`https://app.autotask.run/api/v1/plugin-lifecycle/oauth/callback`.
+`https://api.autotask.run/api/v1/plugin-lifecycle/oauth/callback`.
 
 The `oauth_echo` MCP tool needs scope `read:demo` and returns only its synthetic
 message. Tokens expire after 15 seconds so a managed Agent task exercises the

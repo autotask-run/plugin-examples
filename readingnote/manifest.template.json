@@ -1,0 +1,58 @@
+{
+  "$schema": "https://autotask.run/schemas/plugin.v1.json",
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "private-__AUTHOR_ID__/reading-note",
+    "name": "reading-note",
+    "display_name": "读书笔记",
+    "version": "1.0.0",
+    "description": "一个安全的声明式读书笔记字段类型，不运行作者代码。",
+    "author": {
+      "name": "__AUTHOR_NAME__"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT",
+    "tags": ["notes", "reading", "中文"]
+  },
+  "classification": {
+    "plugin_kind": "note_type",
+    "source_kind": "native",
+    "runtime_kinds": ["external"],
+    "categories": ["notes", "productivity"]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "metadata",
+      "kind": "external",
+      "protocol": "metadata_only"
+    }
+  ],
+  "capabilities": {
+    "note_types": [
+      {
+        "name": "reading_note",
+        "title": "读书笔记",
+        "description": "记录作者、评分、阅读状态和阅读日期。",
+        "runtime_id": "metadata",
+        "runtime_kind": "external",
+        "support_level": "metadata_only",
+        "type_key": "reading_note",
+        "fields": [
+          {"key": "author", "label": "作者", "type": "text", "indexable": true},
+          {"key": "rating", "label": "评分", "type": "number"},
+          {"key": "finished", "label": "已读", "type": "boolean"},
+          {"key": "read_date", "label": "阅读日期", "type": "date"},
+          {
+            "key": "status",
+            "label": "状态",
+            "type": "select",
+            "options": [
+              {"value": "reading", "label": "在读"},
+              {"value": "finished", "label": "读完"}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

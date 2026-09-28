@@ -1,0 +1,159 @@
+{
+  "$schema": "https://docs.autotask.run/schemas/plugin-submission.schema.json",
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-__AUTHOR_ID__/obsidian-note-template",
+    "name": "obsidian-note-template",
+    "display_name": "Obsidian-style note template",
+    "version": "1.0.0",
+    "description": "A restricted Chinese Markdown daily-note template and selection-to-checklist command inspired by Obsidian Templater.",
+    "author": {
+      "name": "__AUTHOR_NAME__",
+      "url": "https://github.com/__AUTHOR_HANDLE__"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT",
+    "tags": ["obsidian", "templater", "notes", "markdown", "中文"]
+  },
+  "classification": {
+    "plugin_kind": "mcp_server",
+    "source_kind": "native",
+    "runtime_kinds": ["mcp"],
+    "categories": ["notes", "productivity"]
+  },
+  "runtimes": [
+    { "runtime_id": "mcp", "kind": "mcp", "protocol": "mcp" }
+  ],
+  "permissions": [
+    {
+      "permission": "note.read_selection",
+      "risk_level": "low",
+      "reason": "Only the current note-editor selection is sent to the installed template service."
+    },
+    {
+      "permission": "network:notes.example.com",
+      "risk_level": "low",
+      "reason": "Connects to the author-hosted HTTPS Streamable HTTP MCP service."
+    }
+  ],
+  "capabilities": {
+    "tools": [
+      {
+        "name": "obsidian.note-template.daily",
+        "title": "Insert daily note template",
+        "description": "Generate a Chinese Markdown daily-note template using the current date, time and selection.",
+        "runtime_id": "mcp",
+        "runtime_kind": "mcp",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["network:notes.example.com"],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "commandId": { "type": "string" },
+            "tool": { "type": "string" },
+            "mode": { "type": "string", "enum": ["insert", "replace"] },
+            "selection": { "type": "string", "description": "Current selection; an empty value creates a blank focus section." },
+            "traceId": { "type": "string" }
+          },
+          "required": ["commandId", "tool", "mode", "selection", "traceId"],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "replace_selection.v1" },
+            "text": { "type": "string" }
+          },
+          "required": ["kind", "text"]
+        },
+        "metadata": {
+          "mcp_tool_name": "obsidian.note-template.daily",
+          "mcp_server": {
+            "name": "autotask-obsidian-note-template",
+            "config": {
+              "url": "https://notes.example.com/mcp",
+              "transport": "streamable-http"
+            }
+          },
+          "prompt_instructions": "Only use the current selection as input; the server supplies the date and time in NOTE_TEMPLATE_TIME_ZONE."
+        }
+      },
+      {
+        "name": "obsidian.note-template.checklist",
+        "title": "Turn selection into checklist",
+        "description": "Convert each selected line into an unchecked Markdown task.",
+        "runtime_id": "mcp",
+        "runtime_kind": "mcp",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["network:notes.example.com"],
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "commandId": { "type": "string" },
+            "tool": { "type": "string" },
+            "mode": { "type": "string", "enum": ["insert", "replace"] },
+            "selection": { "type": "string" },
+            "traceId": { "type": "string" }
+          },
+          "required": ["commandId", "tool", "mode", "selection", "traceId"],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "replace_selection.v1" },
+            "text": { "type": "string" }
+          },
+          "required": ["kind", "text"]
+        },
+        "metadata": {
+          "mcp_tool_name": "obsidian.note-template.checklist",
+          "mcp_server": {
+            "name": "autotask-obsidian-note-template",
+            "config": {
+              "url": "https://notes.example.com/mcp",
+              "transport": "streamable-http"
+            }
+          },
+          "prompt_instructions": "Only process the current selection and return Markdown checkboxes; never create AutoTask todo objects."
+        }
+      }
+    ],
+    "slash_commands": [
+      {
+        "name": "daily-note-template",
+        "title": "Insert daily note template",
+        "description": "Chinese daily-note template. Aliases: 每日模板, 今日笔记, 日记模板.",
+        "handler": "obsidian.note-template.daily",
+        "runtime_id": "mcp",
+        "runtime_kind": "mcp",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["note.read_selection"],
+        "visible_in": ["note_editor"],
+        "metadata": {
+          "tool_ref": "obsidian.note-template.daily",
+          "aliases": ["每日模板", "今日笔记", "日记模板", "daily-note"]
+        }
+      },
+      {
+        "name": "selection-checklist",
+        "title": "Turn selection into checklist",
+        "description": "Convert the selection into a Chinese Markdown checklist. Aliases: 整理待办, 待办清单.",
+        "handler": "obsidian.note-template.checklist",
+        "runtime_id": "mcp",
+        "runtime_kind": "mcp",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["note.read_selection"],
+        "visible_in": ["note_editor"],
+        "metadata": {
+          "tool_ref": "obsidian.note-template.checklist",
+          "aliases": ["整理待办", "待办清单", "checklist"]
+        }
+      }
+    ]
+  }
+}

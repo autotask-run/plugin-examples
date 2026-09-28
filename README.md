@@ -19,6 +19,14 @@ For a public LLM Provider descriptor, see [llm-provider-example](llm-provider-ex
 it declares one reviewed HTTPS OpenAI-compatible endpoint and a bounded static
 model list. It carries no API key, proxy or dynamic model discovery.
 
+For note and todo extensions, see [obsidian-note-template](obsidian-note-template)
+for a runnable Chinese note-editor MCP/Slash Command service,
+[todo-eisenhower](todo-eisenhower) for the host-rendered Eisenhower quadrant
+manifest, and [readingnote](readingnote) for a private declarative reading-note
+type. The note and todo examples match the current AutoTask production
+contracts; the host owns note write confirmation, todo data access and browser
+rendering.
+
 For a local CLI Tool, see [local-tool-example](local-tool-example): it runs a
 read-only `stdio-json-v1` process from `autotask run-local`, includes Linux/macOS
 and Windows launch manifests, and demonstrates plugin-side sandbox checks. Local
@@ -52,6 +60,10 @@ python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
 python3 -m unittest discover -s knowledge-provider-example -v
 python3 -m unittest discover -s llm-provider-example -v
+python3 -m unittest discover -s obsidian-note-template -p 'test_manifest.py' -v
+node --test obsidian-note-template/server.integration.test.mjs
+python3 -m unittest discover -s todo-eisenhower -v
+python3 -m unittest discover -s readingnote -v
 python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
@@ -63,7 +75,10 @@ python3 -m unittest discover -s agent-adapter-example -v
 python3 remote-mcp/server.py
 ```
 
-Requires Python 3.10+. The local endpoint is `http://127.0.0.1:8765/mcp`. The template's `https://mcp.example.com/mcp` is a placeholder. Host your instance behind HTTPS before submitting.
+Requires Python 3.10+. The note service tests additionally require Node.js 18+
+(Node 22 is used in CI). The local endpoint is `http://127.0.0.1:8765/mcp`.
+The template's `https://mcp.example.com/mcp` is a placeholder. Host your
+instance behind HTTPS before submitting.
 
 Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer → consumer workflow, or the [AutoTask developer guide](https://docs.autotask.run/?section=plugin-development).
 
@@ -80,6 +95,9 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 | [skill-provider-example/](skill-provider-example) | Public `autotask.skill-provider.v1` MCP provider and complete snapshot tests |
 | [knowledge-provider-example/](knowledge-provider-example) | Public `autotask.knowledge-source.v1` provider, bounded documents and cursor sync |
 | [llm-provider-example/](llm-provider-example) | Public fixed OpenAI-compatible LLM Provider descriptor and manifest tests |
+| [obsidian-note-template/](obsidian-note-template) | Runnable Chinese note-editor MCP service, public manifest and Node/Python tests |
+| [todo-eisenhower/](todo-eisenhower) | Public `autotask.todo-view.v1` Eisenhower view manifest and schema tests |
+| [readingnote/](readingnote) | Private declarative `note_type` manifest for reading notes and schema tests |
 | [local-tool-example/](local-tool-example) | Local CLI `stdio-json-v1` tool, platform launch manifests, and sandbox tests |
 | [hook-example/](hook-example) | Workspace-private `autotask.hook.v1` prompt Hook and lifecycle steps |
 | [slash-command-example/](slash-command-example) | Workspace-private prompt Slash Command, raw args and ambiguity rules |
@@ -91,7 +109,7 @@ Read [AUTHORING.md](AUTHORING.md) for the complete author → platform reviewer 
 
 The submission workflow requires an AutoTask build exposing `/api/v1/plugin-submissions`, and CLI **0.1.1 or later** with `plugin submit` / `plugin submissions`. The MCP example itself runs independently of AutoTask. A [public demo endpoint](https://docs.autotask.run/examples/text-stats/mcp) is available for client testing; actual submissions should use an HTTPS endpoint operated by the author.
 
-Public submissions support remote HTTPS MCP tools, remote `autotask.tool-provider.v1` catalogs, remote `autotask.skill-provider.v1` catalogs, remote `autotask.knowledge-source.v1` providers, immutable text-only `skill_pack` bundles, personal memory providers and declarative Agent Studio UI panels. API keys or OAuth are declared in the manifest and connected by each installer; credentials are never embedded in the submission. Platform review and publication remain separate from installation, profile binding and actual invocation. Local executable packages, source-integrated extensions and personal private Skill bundles remain outside the public submission path; use `--local-plugin` or a workspace-private catalog entry for local development.
+Public submissions support remote HTTPS MCP tools, note-editor Slash Commands, fixed-protocol Eisenhower todo views, remote `autotask.tool-provider.v1` catalogs, remote `autotask.skill-provider.v1` catalogs, remote `autotask.knowledge-source.v1` providers, immutable text-only `skill_pack` bundles, personal memory providers and declarative Agent Studio UI panels. API keys or OAuth are declared in the manifest and connected by each installer; credentials are never embedded in the submission. Platform review and publication remain separate from installation, profile binding and actual invocation. Declarative `note_type` manifests remain owner-only in this release; see [readingnote](readingnote). Local executable packages, source-integrated extensions and personal private Skill bundles remain outside the public submission path; use `--local-plugin` or a workspace-private catalog entry for local development.
 
 The server uses the MCP [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports) and [tools protocol](https://modelcontextprotocol.io/specification/2025-06-18/server/tools). It returns JSON responses and does not provide a server-initiated SSE stream. Unknown browser Origins are rejected by default. Use an HTTPS proxy with rate/request-size limits for a public deployment; this is a small instructional server, not a production hosting stack.
 

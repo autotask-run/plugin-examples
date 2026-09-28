@@ -13,19 +13,38 @@ from typing import Any
 
 MAX_ITEMS = 100
 MAX_BYTES = 256 * 1024
-REVISION = "example-catalog-v1"
+REVISION = "example-catalog-v2"
+
+RELEASE_CHECKLIST_README = """---
+name: example/release-checklist
+description: Check release evidence before a rollout.
+version: 1.0.1
+author: Example catalog
+tags:
+  - release
+---
+
+# Release checklist
+
+1. Confirm the release version, source commit, and built artifact match.
+2. Record the test results and a successful health check for the candidate.
+3. Write down the rollback artifact and the person responsible for the rollback.
+
+Keep the evidence with the release record. See `references/release.md` for a
+compact template when a release record is needed.
+"""
 
 DEFAULT_CATALOG: list[dict[str, Any]] = [
     {
         "external_id": "example/release-checklist",
         "name": "release-checklist",
         "description": "Check release evidence, versioning and rollback notes.",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "author": {"name": "Example catalog"},
         "tags": ["release", "review"],
-        "readme_content": "---\nname: example/release-checklist\ndescription: Check release evidence.\nversion: 1.0.0\nauthor: Example catalog\ntags:\n  - release\ntools:\n  - file_read\n---\n\n# Release checklist\n",
-        "manifest_json": '{"id":"example/release-checklist","version":"1.0.0"}',
-        "files": [{"path": "references/release.md", "content": "Confirm version, evidence, rollback and owner."}],
+        "readme_content": RELEASE_CHECKLIST_README,
+        "manifest_json": '{"id":"example/release-checklist","version":"1.0.1"}',
+        "files": [{"path": "references/release.md", "content": "Version / commit / artifact:\nTests and health check:\nRollback artifact / owner:\n"}],
     },
     {
         "external_id": "example/incident-summary",

@@ -5,6 +5,7 @@ WORKDIR /app
 COPY --chown=10001:10001 remote-tool-provider/server.py /app/remote-tool-provider/server.py
 COPY --chown=10001:10001 skill-provider-example/server.py skill-provider-example/provider.py /app/skill-provider-example/
 COPY --chown=10001:10001 memory-mcp/server.py /app/memory-mcp/server.py
+COPY --chown=10001:10001 oauth-mcp-example/server.py /app/oauth-mcp-example/server.py
 USER 10001:10001
 
 # The deployment selects exactly one example with an explicit command. Each

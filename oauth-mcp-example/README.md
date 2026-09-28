@@ -9,7 +9,7 @@ client ID is `autotask-plugin-acceptance`. Its only registered callback is
 `https://api.autotask.run/api/v1/plugin-lifecycle/oauth/callback`.
 
 The `oauth_echo` MCP tool needs scope `read:demo` and returns only its synthetic
-message. Tokens expire after 15 seconds so a managed Agent task exercises the
+message. Tokens expire after 120 seconds so a managed Agent task exercises the
 refresh path. Codes and refresh tokens are one use. Authorization auto-consents
 for the fixed client, so the example proves protocol interoperability but not
 real user authentication or independent third-party compatibility.

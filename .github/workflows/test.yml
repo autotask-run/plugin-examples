@@ -10,3 +10,10 @@ jobs:
           python-version: '3.10'
       - run: python3 -m unittest discover -s remote-mcp -v
       - run: python3 remote-mcp/prepare.py --author-id 42 --url https://mcp.example.com/mcp
+      - run: python3 -m unittest discover -s obsidian-note-template -p 'test_manifest.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test obsidian-note-template/server.integration.test.mjs
+      - run: python3 -m unittest discover -s todo-eisenhower -v
+      - run: python3 -m unittest discover -s readingnote -v

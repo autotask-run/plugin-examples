@@ -1,0 +1,60 @@
+{
+  "$schema": "https://docs.autotask.run/schemas/plugin-submission.schema.json",
+  "schema_version": "autotask.plugin.v1",
+  "identity": {
+    "plugin_id": "user-__AUTHOR_ID__/eisenhower-quadrants",
+    "name": "eisenhower-quadrants",
+    "display_name": "Eisenhower Quadrants",
+    "version": "1.0.0",
+    "description": "A host-rendered personal todo view that groups open todos by importance and urgency.",
+    "author": {
+      "name": "__AUTHOR_NAME__",
+      "url": "https://github.com/__AUTHOR_HANDLE__"
+    },
+    "repository": "https://github.com/autotask-run/plugin-examples",
+    "license": "MIT",
+    "tags": ["todos", "eisenhower", "productivity"]
+  },
+  "classification": {
+    "plugin_kind": "ui_extension",
+    "source_kind": "native",
+    "runtime_kinds": ["hosted"],
+    "categories": ["todos", "productivity"]
+  },
+  "runtimes": [
+    {
+      "runtime_id": "hosted",
+      "kind": "hosted",
+      "protocol": "autotask.todo-view.v1"
+    }
+  ],
+  "permissions": [
+    { "permission": "todo:read", "risk_level": "low" },
+    { "permission": "todo:write", "risk_level": "low" }
+  ],
+  "capabilities": {
+    "ui_extensions": [
+      {
+        "name": "eisenhower",
+        "title": "Eisenhower Quadrants",
+        "description": "Group open personal todos by importance and urgency.",
+        "runtime_id": "hosted",
+        "runtime_kind": "hosted",
+        "support_level": "executable_existing_runtime",
+        "risk_level": "low",
+        "permissions": ["todo:read", "todo:write"],
+        "surface": "personal_todos",
+        "entrypoint": "eisenhower",
+        "metadata": {
+          "protocol": "autotask.todo-view.v1",
+          "view": "eisenhower",
+          "rules": {
+            "importance": "priority_high",
+            "urgency": "planned_date_on_or_before_local_date"
+          },
+          "actions": ["complete", "set_priority", "set_planned_date"]
+        }
+      }
+    ]
+  }
+}

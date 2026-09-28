@@ -2,7 +2,7 @@
 
 Public listing means **third-party submission → platform review and publication → installation by other workspaces**. An ordinary author account is sufficient to submit; administrators alone approve and publish.
 
-Public submissions support remote HTTPS MCP tools, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, fixed OpenAI-compatible LLM Provider descriptors, personal memory providers using Streamable HTTP, and declarative Agent Studio UI panels. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Local executables, built-in Go extensions, hooks and source-integrated/public Channels remain outside this author submission release. This document follows the `remote-mcp` tool example; see [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [llm-provider-example](llm-provider-example/README.md), [memory-mcp](memory-mcp/README.md), [ui-panel-example](ui-panel-example/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md), [remote-channel-example](remote-channel-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
+Public submissions support remote HTTPS MCP tools, note-editor Slash Commands, the fixed `autotask.todo-view.v1` Eisenhower view, the remote `autotask.tool-provider.v1` and `autotask.skill-provider.v1` catalog contracts, immutable text-only `skill_pack` bundles, fixed OpenAI-compatible LLM Provider descriptors, personal memory providers using Streamable HTTP, and declarative Agent Studio UI panels. Authors host remote services; AutoTask stores reviewed Skill content and distributes reviewed connection metadata. API keys and OAuth are declared in the manifest and connected by each installer, never embedded as shared secrets. Declarative `note_type` manifests are owner-only in this release. Local executables, built-in Go extensions, hooks and source-integrated/public Channels remain outside this author submission release. This document follows the `remote-mcp` tool example; see [obsidian-note-template](obsidian-note-template/README.md), [todo-eisenhower](todo-eisenhower/README.md), [readingnote](readingnote/README.md), [remote-tool-provider](remote-tool-provider/README.md), [skill-provider-example](skill-provider-example/README.md), [skill-example](skill-example/README.md), [llm-provider-example](llm-provider-example/README.md), [memory-mcp](memory-mcp/README.md), [ui-panel-example](ui-panel-example/README.md), [local-tool-example](local-tool-example/README.md), [hook-example](hook-example/README.md), [slash-command-example](slash-command-example/README.md), [channel-provider-example](channel-provider-example/README.md), [remote-channel-example](remote-channel-example/README.md) and [agent-adapter-example](agent-adapter-example/README.md) for provider and private extension contracts.
 
 ## Agent configuration adapters
 
@@ -33,6 +33,10 @@ python3 -m unittest discover -s remote-tool-provider -v
 python3 -m unittest discover -s skill-example -v
 python3 -m unittest discover -s skill-provider-example -v
 python3 -m unittest discover -s llm-provider-example -v
+python3 -m unittest discover -s obsidian-note-template -p 'test_manifest.py' -v
+node --test obsidian-note-template/server.integration.test.mjs
+python3 -m unittest discover -s todo-eisenhower -v
+python3 -m unittest discover -s readingnote -v
 python3 -m unittest discover -s local-tool-example -v
 python3 -m unittest discover -s hook-example -v
 python3 -m unittest discover -s slash-command-example -v
@@ -125,6 +129,82 @@ autotask plugin submit --manifest /tmp/autotask-ui-panel.json --dry-run
 After publication, a consumer installs the plugin in a workspace, binds an
 Agent Profile, opens its Agent Studio subpage and creates a task from the form.
 Personal scope does not accept UI panels in this release.
+
+## Note editor commands
+
+[`obsidian-note-template`](obsidian-note-template/README.md) is a runnable
+MCP service for the `note_editor` surface. It declares two tools and two
+Slash Commands in one manifest. Each command receives only the current
+selection and returns a `replace_selection.v1` proposal; the AutoTask host
+performs the document hash check and requires the user to confirm before
+writing. The sample is safe to host because it evaluates no template code and
+does not read a Vault or the rest of the document.
+
+Run its local tests and generate a public author manifest:
+
+```bash
+python3 -m unittest discover -s obsidian-note-template -p 'test_manifest.py' -v
+node --test obsidian-note-template/server.integration.test.mjs
+python3 obsidian-note-template/prepare.py \
+  --author-id 42 \
+  --url https://notes.example.com/mcp \
+  --out /tmp/autotask-note-template.json
+autotask plugin submit --manifest /tmp/autotask-note-template.json --dry-run
+```
+
+The endpoint must be HTTPS and author operated. The generated manifest's
+`classification.categories` contains `notes`; this is a Plugin Market usage
+filter and does not change the MCP or installation security model. After
+publication, install it in a personal workspace and bind each desired
+`slash_commands` capability. The commands then appear in the note editor's `/`
+menu, including the Chinese aliases.
+
+## Eisenhower todo view
+
+[`todo-eisenhower`](todo-eisenhower/README.md) is the declarative public shape
+for `autotask.todo-view.v1`. It contains no runtime URL or browser code. The
+host renders the personal todo view using the fixed `priority_high` and
+`planned_date_on_or_before_local_date` rules and applies only the existing
+`complete`, `set_priority`, and `set_planned_date` operations. A reviewed
+submission can be installed in a personal workspace and appears as the
+todo-page **Quadrants** entry.
+
+```bash
+python3 -m unittest discover -s todo-eisenhower -v
+python3 todo-eisenhower/prepare.py --author-id 42 --out /tmp/autotask-eisenhower.json
+autotask plugin submit --manifest /tmp/autotask-eisenhower.json --dry-run
+```
+
+The manifest must contain exactly one hosted runtime with protocol
+`autotask.todo-view.v1`, the `personal_todos` surface, the `eisenhower`
+entrypoint, both `todo:read` and `todo:write`, and the three fixed actions.
+Arbitrary HTML, JavaScript and custom remote views are rejected by the
+submission validator.
+
+## Declarative reading-note type
+
+[`readingnote`](readingnote/README.md) is a metadata-only `note_type` example.
+It is intentionally generated under `private-<user-id>/` because the current
+release allows note types in an owner's personal catalog, not ordinary public
+submission. AutoTask owns field validation and storage; the plugin has no
+process, URL, command or custom component.
+
+```bash
+python3 -m unittest discover -s readingnote -v
+python3 readingnote/prepare.py --author-id 42 --out /tmp/autotask-reading-note.json
+autotask plugin publish --scope personal \
+  --manifest /tmp/autotask-reading-note.json --dry-run --json
+```
+
+## GitHub note sync boundary
+
+The `autotask.note-sync.v1` contract is a separate owner-authorized provider
+boundary. A provider exposes `validate_config`, `list_entries`, `get_entry`,
+and compare-and-swap `put_entry` over MCP; the GitHub token remains inside the
+provider. The production repository contains an internal Go reference that
+depends on AutoTask server packages, so this public repository does not claim
+it is independently runnable. Authors should use the note-sync contract in
+the AutoTask guide and keep upstream credentials out of manifests.
 
 ## Worker executor plugins
 
